@@ -65,8 +65,8 @@ choose_board(Board) :-
 menu([Board, Player, [], 0]) :-
     welcome_message,
     choose_mode,
-    choose_board(Board).
-
+    choose_board(Board),
+    Player = player1.
 
 
 
