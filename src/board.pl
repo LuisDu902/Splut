@@ -14,36 +14,36 @@ create_list(Size, [Elem|Rest], Elem) :-
 
 create_row(1, Size, Row):-
     Padding is (Size - 1 ) // 2,
-    create_list(Padding, A, '-'),
-    append([A, ['r1'], A], Row), !.
+    create_list(Padding, A, e-e),
+    append([A, [r-1], A], Row), !.
 
 create_row(Size, Size, Row):-
     Padding is (Size - 1 ) // 2,
-    create_list(Padding, A, '-'),
-    append([A, ['r4'], A], Row), !.
+    create_list(Padding, A, e-e),
+    append([A, [r-4], A], Row), !.
 
 create_row(2, Size, Row):-
     Padding is (Size - 3) // 2,
-    create_list(Padding, A, '-'),
-    append([A, ['t1', 'd1', 's1'], A], Row), !.
+    create_list(Padding, A, e-e),
+    append([A, [t-2, d-2, s-2], A], Row), !.
 
 create_row(Index, Size, Row):-
     Index is Size-1,
     Padding is (Size - 3) // 2,
-    create_list(Padding, A, '-'),
-    append([A, ['t2', 'd2', 's2'], A], Row), !.
+    create_list(Padding, A, e-e),
+    append([A, [s-1, d-1, t-1], A], Row), !.
 
 create_row(Index, Size, Row):-
     Index is (Size+1) // 2,
     Empty is Size - 2,
-    create_list(Empty, A, 'x'),
-    append([['r2'], A, ['r3']], Row), !.
+    create_list(Empty, A, x-x),
+    append([[r-2], A, [r-3]], Row), !.
 
 create_row(Index, Size, Row):-
     Padding is abs((Size + 1) // 2 - Index),
     Rest is Size - 2 * Padding,
-    create_list(Padding, A, '-'),
-    create_list(Rest, B, 'x'),
+    create_list(Padding, A, e-e),
+    create_list(Rest, B, x-x),
     append([A, B, A], Row), !.
 
 % -----------------------------------------
@@ -141,16 +141,16 @@ display_rows([Row|Rest], Size, Index) :-
 % -----------------------------------------
 
 
-last_elem('-', _).
+last_elem(e-e, _).
 
 last_elem(_, []):- write('|').
 
 last_elem(_, [H | _]):-
-    H = '-',
+    H = e-e,
     write('|').
 
 last_elem(_, [H | _]):-
-    H \= '-'.
+    H \= e-e.
 
 
 display_row([]). 
@@ -162,15 +162,14 @@ display_row([Element|Rest]) :-
 
 % -----------------------------------------
 
-display_element(-) :- write('    ').
-display_element(x) :- write('|   ').
-display_element(r1) :- write('| r ').
-display_element(r2) :- write('| r ').
-display_element(r3) :- write('| r ').
-display_element(r4) :- write('| r ').
-display_element(t1) :- write('| t ').
-display_element(d1) :- write('| d ').
-display_element(s1) :- write('| s ').
-display_element(t2) :- write('| T ').
-display_element(d2) :- write('| D ').
-display_element(s2) :- write('| S ').
+
+color(r-_, 33) :- !.
+color(_-1, 34) :- !.
+color(_-2, 31) :- !.
+color(_-_, 0) :- !.
+
+display_element(x-x) :- write('|   '), !.
+
+display_element(X-Y) :- 
+    color(X-Y, ColorCode),
+    (ColorCode \= 0 -> format('| \e[~dm~w\e[0m ', [ColorCode, X]); write('    ')).
