@@ -48,17 +48,14 @@ choose_name(Player):-
 % -----------------------------------------
 
 select_board_size :-
-    write('\nChoose the board size:\n'),
-    write('[1] 9 x 9\n'),
-    write('[2] 11 x 11\n'),
-    write('[3] 13 x 13\n\n').
+    write('\nChoose the board size (odd number greater than 7): ').
 
 % -----------------------------------------
 
 choose_board(Board) :-
     select_board_size,
-    select_option(1, 3, Option),
-    create_board(Option, Board).
+    read_number_input(Size),
+    create_board(Size, Board).
 
 % -----------------------------------------
 

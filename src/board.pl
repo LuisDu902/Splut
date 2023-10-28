@@ -1,46 +1,68 @@
 
-create_board(1,  [
-    [ - , - , - , - , r , - , - , - , - ], 
-    [ - , - , - , t1 , d1 , s1 , - , - , - ],
-    [ - , - , x , x , x , x , x , - , - ], 
-    [ - , x , x , x , x , x , x , x , - ],
-    [ r , x , x , x , x , x , x , x , r ], 
-    [ - , x , x , x , x , x , x , x , - ],
-    [ - , - , x , x , x , x , x , - , - ], 
-    [ - , - , - , s2 , d2 , t2 , - , - , - ],
-    [ - , - , - , - , r , - , - , - , - ]
-]).
 
-create_board(2,  [
-    [ - , - , - , - , - , r , - , - , - , - , - ], 
-    [ - , - , - , - , t1 , d1 , s1 , - , - , - , - ],
-    [ - , - , - , x , x , x , x , x , - , - , - ], 
-    [ - , - , x , x , x , x , x , x , x , - , - ],
-    [ - , x , x , x , x , x , x , x , x , x , - ],
-    [ r , x , x , x , x , x , x , x , x , x , r ], 
-    [ - , x , x , x , x , x , x , x , x , x , - ],
-    [ - , - , x , x , x , x , x , x , x , - , - ],
-    [ - , - , - , x , x , x , x , x , - , - , - ], 
-    [ - , - , - , - , s2 , d2 , t2 , - , - , - , - ],
-    [ - , - , - , - , - , r , - , - , - , - , - ]
-]).
 
-create_board(3,  [
-    [ - , - , - , - , - , - , r , - , - , - , - , - , - ], 
-    [ - , - , - , - , - , t1 , d1 , s1 , - , - , - , - , - ], 
-    [ - , - , - , - , x , x , x , x , x , - , - , - , - ], 
-    [ - , - , - , x , x , x , x , x , x , x , - , - , - ], 
-    [ - , - , x , x , x , x , x , x , x , x , x , - , - ], 
-    [ - , x , x , x , x , x , x , x , x , x , x , x , - ], 
-    [ r , x , x , x , x , x , x , x , x , x , x , x , r ], 
-    [ - , x , x , x , x , x , x , x , x , x , x , x , - ], 
-    [ - , - , x , x , x , x , x , x , x , x , x , - , - ], 
-    [ - , - , - , x , x , x , x , x , x , x , - , - , - ], 
-    [ - , - , - , - , x , x , x , x , x , - , - , - , - ], 
-    [ - , - , - , - , - , s2 , d2 , t2 , - , - , - , - , - ], 
-    [ - , - , - , - , - , - , r , - , - , - , - , - , - ]
-]).
+:- use_module(library(lists)).
 
+create_list(0, [], _).
+
+create_list(Size, [Elem|Rest], Elem) :-
+    Size > 0,
+    Size1 is Size - 1,
+    create_list(Size1, Rest, Elem).
+
+% -----------------------------------------
+
+create_row(1, Size, Row):-
+    Padding is (Size - 1 ) // 2,
+    create_list(Padding, A, '-'),
+    append([A, ['r1'], A], Row), !.
+
+create_row(Size, Size, Row):-
+    Padding is (Size - 1 ) // 2,
+    create_list(Padding, A, '-'),
+    append([A, ['r4'], A], Row), !.
+
+create_row(2, Size, Row):-
+    Padding is (Size - 3) // 2,
+    create_list(Padding, A, '-'),
+    append([A, ['t1', 'd1', 's1'], A], Row), !.
+
+create_row(Index, Size, Row):-
+    Index is Size-1,
+    Padding is (Size - 3) // 2,
+    create_list(Padding, A, '-'),
+    append([A, ['t2', 'd2', 's2'], A], Row), !.
+
+create_row(Index, Size, Row):-
+    Index is (Size+1) // 2,
+    Empty is Size - 2,
+    create_list(Empty, A, 'x'),
+    append([['r2'], A, ['r3']], Row), !.
+
+create_row(Index, Size, Row):-
+    Padding is abs((Size + 1) // 2 - Index),
+    Rest is Size - 2 * Padding,
+    create_list(Padding, A, '-'),
+    create_list(Rest, B, 'x'),
+    append([A, B, A], Row), !.
+
+% -----------------------------------------
+
+create_board(Size, Board):-
+    create_board_aux(1, Size, [], Board).
+
+create_board_aux(Size, Size, AuxBoard, Board):-
+    create_row(Size, Size, Row),
+    append(AuxBoard, [Row], Board), !.
+
+create_board_aux(Index, Size, AuxBoard, Board):-
+    Index < Size,
+    create_row(Index, Size, Row),
+    NextIndex is Index + 1,
+    append(AuxBoard, [Row], UpdatedBoard),
+    create_board_aux(NextIndex, Size, UpdatedBoard, Board), !.
+
+% -----------------------------------------
 
 display_board(Board) :-
     length(Board, Size),
@@ -54,11 +76,11 @@ display_col_index(1, Size):-
     display_col_index(2, Size).
 
 display_col_index(Size, Size) :-
-    format('   ~d\n', [Size]).
+   (Size >= 10 ->  format('  ~d\n', [Size]) ; format('   ~d\n', [Size])).
 
 display_col_index(N, Size) :-
     N < Size,
-    format('   ~d', [N]),
+   (N >= 10 -> format('  ~d', [N]) ; format('   ~d', [N])),
     N1 is N + 1,
     display_col_index(N1, Size).
 
@@ -119,15 +141,15 @@ display_rows([Row|Rest], Size, Index) :-
 % -----------------------------------------
 
 
-handle_pipe('-', _).
+last_elem('-', _).
 
-handle_pipe(_, []):- write('|').
+last_elem(_, []):- write('|').
 
-handle_pipe(_, [H | _]):-
+last_elem(_, [H | _]):-
     H = '-',
     write('|').
 
-handle_pipe(_, [H | _]):-
+last_elem(_, [H | _]):-
     H \= '-'.
 
 
@@ -135,14 +157,17 @@ display_row([]).
 
 display_row([Element|Rest]) :-
     display_element(Element), 
-    handle_pipe(Element, Rest),
+    last_elem(Element, Rest),
     display_row(Rest).
 
 % -----------------------------------------
 
 display_element(-) :- write('    ').
 display_element(x) :- write('|   ').
-display_element(r) :- write('| r ').
+display_element(r1) :- write('| r ').
+display_element(r2) :- write('| r ').
+display_element(r3) :- write('| r ').
+display_element(r4) :- write('| r ').
 display_element(t1) :- write('| t ').
 display_element(d1) :- write('| d ').
 display_element(s1) :- write('| s ').
