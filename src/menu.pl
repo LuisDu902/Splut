@@ -20,18 +20,18 @@ mode_menu :-
 
 game_mode(1) :-
     write('\nPlaying Human vs Human\n'),
-    choose_name(player1),
-    choose_name(player2).
+    choose_name(p1),
+    choose_name(p2).
 
 game_mode(2) :-
     write('\nPlaying Human vs Computer\n'),
-    choose_name(player1),
-    asserta((player_name(player2, 'Computer'))).
+    choose_name(p1),
+    asserta((player_name(p2, 'Computer'))).
 
 game_mode(3) :-
     write('\nPlaying Bot vs Bot\n'),
-    asserta((player_name(player1, 'Computer1'))),
-    asserta((player_name(player2, 'Computer2'))).
+    asserta((player_name(p1, 'Computer1'))),
+    asserta((player_name(p2, 'Computer2'))).
 
 % -----------------------------------------
 
@@ -65,4 +65,4 @@ menu([Board, Player, [], 0]) :-
     welcome_message,
     choose_mode,
     choose_board(Board),
-    Player = player1.
+    Player = p1.

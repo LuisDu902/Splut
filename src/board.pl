@@ -1,3 +1,5 @@
+:- dynamic position/2.
+
 % -----------------------------------------
 
 create_list(0, [], _).
@@ -22,13 +24,19 @@ create_row(Size, Size, Row):-
 create_row(2, Size, Row):-
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    append([A, [t-2, d-2, s-2], A], Row), !.
+    append([A, [t-p2, d-p2, s-p2], A], Row),
+    asserta(position(t-p2, 2-4)),
+    asserta(position(d-p2, 2-5)),
+    asserta(position(s-p2, 2-6)), !.
 
 create_row(Index, Size, Row):-
     Index is Size-1,
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    append([A, [s-1, d-1, t-1], A], Row), !.
+    append([A, [s-p1, d-p1, t-p1], A], Row), 
+    asserta(position(s-p1, Index-4)),
+    asserta(position(d-p1, Index-5)),
+    asserta(position(t-p1, Index-6)), !.
 
 create_row(Index, Size, Row):-
     Index is (Size+1) // 2,
@@ -161,8 +169,8 @@ display_row([Element|Rest]) :-
 
 
 color(r-_, 33) :- !.
-color(_-1, 34) :- !.
-color(_-2, 31) :- !.
+color(_-p1, 34) :- !.
+color(_-p2, 31) :- !.
 color(_-_, 0) :- !.
 
 display_element(x-x) :- write('|   '), !.

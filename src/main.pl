@@ -5,27 +5,47 @@
 :- consult(utils).
 :- consult(board).
 
+
+
 % -----------------------------------------
 
-game_over(GameState, Winner):-
+game_over(_GameState, _Winner):-
     write('The game is over\n').
 
-congratulate(Winner):-
+congratulate(_Winner):-
     write('You won the game\n').
 
 % -----------------------------------------
 
 display_game([Board, _, _, _]) :-
-    write('Displaying board:\n'),
     display_board(Board).
 
-choose_move(GameState, Move) :-
-    write('Choosing move\n').
+choose_piece(Piece):-
+    write('\nChoose the piece to move: \n'),
+    write('[t] Stonetroll\n'),
+    write('[d] Dwarf\n'),
+    write('[s] Sorcerer\n\n'),
+    write('Option: '),
+    get_char(Piece).
 
-move(GameState, Move, NewGameState) :-
+choose_position(Size, X-Y):-
+    write('\nWhere do you want to move? \n'),
+    skip_line,
+    select_option(1, Size, X),
+    select_option(1, Size, Y).
+
+choose_move([Board, Player, _, _], _Move) :-
+    length(Board, Size),
+    choose_piece(Piece),
+    position(Piece-Player, X-Y),
+    format('Original position: (~d, ~d)\n', [X, Y]),
+    choose_position(Size, Z-W),
+    format('New position: (~d, ~d)\n', [Z, W]).
+
+move(_GameState, _Move, _NewGameState) :-
     write('Moving pieces...\n').
 
-next_player(Player, NextPlayer) :-
+next_player(_Player, _NextPlayer) :-
     write('Passing turn\n').
 
 % -----------------------------------------
@@ -38,10 +58,10 @@ game_cycle(GameState) :-
 
 game_cycle(GameState) :-
     display_game(GameState),
-    choose_move(GameState, Move),
-    move(GameState, Move, NewGameState).
+    choose_move(GameState, _Move).
+    /*move(GameState, Move, NewGameState).
     % next_player(Player, NextPlayer), !,
-    % game_cycle(NewGameState).
+    % game_cycle(NewGameState).*/
 
 % -----------------------------------------
 
