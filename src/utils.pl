@@ -41,3 +41,17 @@ select_board(Size) :-
     format('Invalid input. Please enter an odd number greater than 7: ', []), fail).
 
 % -----------------------------------------
+
+inside_line(Pos, Size) :-
+    Starting is abs((Size + 1) // 2 - Pos) + 1, 
+    Ending is Size - Starting + 1,
+    between(Starting, Ending, Pos).
+
+inside_board(X-Y, Size) :-
+    inside_line(X, Size),
+    inside_line(Y, Size).
+
+new_pos(X-Y, 1, X-NewY) :- NewY is Y - 1.
+new_pos(X-Y, 2, X-NewY) :- NewY is Y + 1.
+new_pos(X-Y, 3, NewX-Y) :- NewX is X - 1.
+new_pos(X-Y, 4, NewX-Y) :- NewX is X + 1.

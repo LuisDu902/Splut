@@ -5,8 +5,6 @@
 :- consult(utils).
 :- consult(board).
 
-
-
 % -----------------------------------------
 
 game_over(_GameState, _Winner):-
@@ -28,22 +26,39 @@ choose_piece(Piece):-
     write('Option: '),
     get_char(Piece).
 
-choose_position(Size, X-Y):-
-    write('\nWhere do you want to move? \n'),
+choose_position(Size, X):-
+    write('\nChoose the direction to move to: \n'),
+    write('[1] Up\n'),
+    write('[2] Down\n'),
+    write('[3] Left\n'),
+    write('[4] Right\n'),
+    write('Option: '),
     skip_line,
-    select_option(1, Size, X),
-    select_option(1, Size, Y).
+    select_option(1, 4, X).
 
 choose_move([Board, Player, _, _], _Move) :-
     length(Board, Size),
+    repeat,
     choose_piece(Piece),
     position(Piece-Player, X-Y),
     format('Original position: (~d, ~d)\n', [X, Y]),
-    choose_position(Size, Z-W),
-    format('New position: (~d, ~d)\n', [Z, W]).
+    choose_position(Size, D),
+    (valid_move(Piece-Player, X-Y, Size, D) -> true ; 
+    format('Please input a valid move\n', []), fail).
+
+valid_move(Piece-Player, X-Y, Size, D) :-
+    new_pos(X-Y, D, NewX-NewY),
+    inside_board(NewX-NewY), 
+    \+ position(_-_, NewX-NewY).
 
 move(_GameState, _Move, _NewGameState) :-
     write('Moving pieces...\n').
+
+update_position(Piece-Player, X-Y) :-
+    retract(position(Piece-Player, _-_)),
+    asserta(position(Piece-Player, X-Y)).
+
+% -----------------------------------------
 
 next_player(_Player, _NextPlayer) :-
     write('Passing turn\n').
