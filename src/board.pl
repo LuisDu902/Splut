@@ -11,38 +11,48 @@ create_list(Size, [Elem|Rest], Elem) :-
 
 % -----------------------------------------
 
+assert_pieces([], _, _).
+assert_pieces([Piece|Rest], Row, Col) :-
+    NextCol is Col+1,
+    asserta(position(Piece, NextCol-Row)),
+    assert_pieces(Rest, Row, NextCol).
+
 create_row(1, Size, Row):-
     Padding is (Size - 1 ) // 2,
     create_list(Padding, A, e-e),
-    append([A, [r-1], A], Row), !.
+    B = [r-1],
+    append([A, B, A], Row),   
+    assert_pieces(B, 1, Padding), !.
 
 create_row(Size, Size, Row):-
     Padding is (Size - 1 ) // 2,
     create_list(Padding, A, e-e),
-    append([A, [r-4], A], Row), !.
+    B = [r-4],
+    append([A, B, A], Row), 
+    assert_pieces(B, Size, Padding), !.
 
 create_row(2, Size, Row):-
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    append([A, [t-p2, d-p2, s-p2], A], Row),
-    asserta(position(t-p2, 2-4)),
-    asserta(position(d-p2, 2-5)),
-    asserta(position(s-p2, 2-6)), !.
+    B = [t-p2, d-p2, s-p2],
+    append([A, B, A], Row),
+    assert_pieces(B, 2, Padding), !.
 
 create_row(Index, Size, Row):-
     Index is Size-1,
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    append([A, [s-p1, d-p1, t-p1], A], Row), 
-    asserta(position(s-p1, Index-4)),
-    asserta(position(d-p1, Index-5)),
-    asserta(position(t-p1, Index-6)), !.
+    B = [s-p1, d-p1, t-p1],
+    append([A, B, A], Row), 
+    assert_pieces(B, Index, Padding), !.
 
 create_row(Index, Size, Row):-
     Index is (Size+1) // 2,
     Empty is Size - 2,
     create_list(Empty, A, x-x),
-    append([[r-2], A, [r-3]], Row), !.
+    append([[r-2], A, [r-3]], Row), 
+    asserta(position(r-2, 1-Index)),
+    asserta(position(r-3, Size-Index)), !.
 
 create_row(Index, Size, Row):-
     Padding is abs((Size + 1) // 2 - Index),

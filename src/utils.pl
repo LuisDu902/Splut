@@ -34,7 +34,6 @@ select_option(Min, Max, Option) :-
     format('Invalid input. Please enter a number between ~d and ~d: ', [Min, Max]), fail).
 
 select_board(Size) :-
-    write('Size : '),
     repeat,
     read_number_input(Size),
     ((Size > 7 , Size mod 2 =:= 1) -> true ; 
@@ -42,14 +41,14 @@ select_board(Size) :-
 
 % -----------------------------------------
 
-inside_line(Pos, Size) :-
-    Starting is abs((Size + 1) // 2 - Pos) + 1, 
+inside_line(Line, Pos, Size) :-
+    Starting is abs((Size + 1) // 2 - Line) + 1, 
     Ending is Size - Starting + 1,
     between(Starting, Ending, Pos).
 
 inside_board(X-Y, Size) :-
-    inside_line(X, Size),
-    inside_line(Y, Size).
+    inside_line(X, Y, Size),
+    inside_line(Y, X, Size).
 
 new_pos(X-Y, 1, X-NewY) :- NewY is Y - 1.
 new_pos(X-Y, 2, X-NewY) :- NewY is Y + 1.
