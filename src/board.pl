@@ -1,7 +1,4 @@
-
-
-
-:- use_module(library(lists)).
+% -----------------------------------------
 
 create_list(0, [], _).
 
@@ -173,3 +170,4 @@ display_element(x-x) :- write('|   '), !.
 display_element(X-Y) :- 
     color(X-Y, ColorCode),
     (ColorCode \= 0 -> format('| \e[~dm~w\e[0m ', [ColorCode, X]); write('    ')).
+    

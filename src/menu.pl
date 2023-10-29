@@ -1,5 +1,7 @@
 :- dynamic player_name/2.
 
+% -----------------------------------------
+
 welcome_message :-
     write('\n+-----------------------+\n'),
     write('|      Welcome to       |\n'),
@@ -54,7 +56,7 @@ select_board_size :-
 
 choose_board(Board) :-
     select_board_size,
-    read_number_input(Size),
+    select_board(Size),
     create_board(Size, Board).
 
 % -----------------------------------------
@@ -64,6 +66,3 @@ menu([Board, Player, [], 0]) :-
     choose_mode,
     choose_board(Board),
     Player = player1.
-
-
-

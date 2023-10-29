@@ -1,3 +1,12 @@
+:- use_module(library(lists)).
+:- use_module(library(between)).
+
+:- consult(menu).
+:- consult(utils).
+:- consult(board).
+
+% -----------------------------------------
+
 game_over(GameState, Winner):-
     write('The game is over\n').
 
@@ -39,4 +48,3 @@ game_cycle(GameState) :-
 play :- 
     menu(GameState), !,
     game_cycle(GameState).
-
