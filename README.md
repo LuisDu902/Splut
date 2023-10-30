@@ -1,4 +1,4 @@
-# Splut! Board Game
+# Implementation of a Board Game in Prolog - Splut!
 
 ## Introduction
 
@@ -36,3 +36,5 @@ The objective of Splut! is to eliminate all opposing Sorcerers by landing a Rock
 ## Win the Game
 
 Eliminate all opposing Sorcerers to win the game. Be strategic, plan your moves, and outwit your opponents in this thrilling game of Splut!
+
+

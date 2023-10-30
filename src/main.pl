@@ -1,5 +1,6 @@
 :- use_module(library(lists)).
 :- use_module(library(between)).
+:- use_module(library(random)).
 
 :- consult(menu).
 :- consult(utils).
@@ -18,6 +19,29 @@ congratulate(_Winner):-
 display_game([Board, _, _, _]) :-
     display_board(Board).
 
+% -----------------------------------------
+
+choose_random_move(Board, Player, 1, Move) :-
+    length(Board, Size),
+    repeat,
+    choose_random_piece(Piece),
+    position(Piece-Player, X-Y),
+    choose_random_direction(D),
+    (valid_move(Piece-Player, X-Y, Size, D) -> format('I chose to move ~a-~a from (~d,~d) -> ~d\n', [Piece, Player, X, Y, D]) ; fail).
+
+% -----------------------------------------
+
+choose_random_piece(Piece) :-
+    List = [t, d, s], 
+    random_member(Piece, List).
+
+% -----------------------------------------
+
+choose_random_direction(D) :-
+    random(1, 4, D).
+
+% -----------------------------------------
+
 choose_piece(Piece):-
     write('\nChoose the piece to move: \n'),
     write('[t] Stonetroll\n'),
@@ -25,6 +49,8 @@ choose_piece(Piece):-
     write('[s] Sorcerer\n\n'),
     write('Option: '),
     get_char(Piece).
+
+% -----------------------------------------
 
 choose_direction(D):-
     write('\nChoose the direction to move to: \n'),
@@ -35,7 +61,10 @@ choose_direction(D):-
     skip_line,
     select_option(1, 4, D).
 
+% -----------------------------------------
+
 choose_move([Board, Player, _, _], _Move) :-
+    \+computer_level(Player, _),      
     length(Board, Size),
     repeat,
     choose_piece(Piece),
@@ -45,6 +74,12 @@ choose_move([Board, Player, _, _], _Move) :-
    
     (valid_move(Piece-Player, X-Y, Size, D) -> true ; 
     format('Please input a valid move: ', []), fail).
+
+choose_move([Board,Player,_,_], Move):-
+    computer_level(Player, Level),                 
+    choose_random_move(Board, Player, Level, Move), !.   
+
+% -----------------------------------------
 
 valid_move(Piece-Player, X-Y, Size, D) :-
     new_pos(X-Y, D, NewX-NewY),
