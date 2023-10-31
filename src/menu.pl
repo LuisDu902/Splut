@@ -66,15 +66,16 @@ select_board_size :-
 
 % -----------------------------------------
 
-choose_board(Board) :-
+choose_board_size(Size):-
     select_board_size,
-    select_board(Size),
-    create_board(Size, Board).
+    select_board(Size).
 
-% -----------------------------------------
-
-menu([Board, Player, [], 0]) :-
+menu(GameState) :-
     welcome_message,
     choose_mode,
-    choose_board(Board),
-    Player = p1.
+    choose_board_size(Size),
+    initial_state(Size, GameState).
+
+
+initial_state(Size, [Board, p1, 0, 0]):-
+    create_board(Size, Board).
