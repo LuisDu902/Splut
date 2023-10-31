@@ -50,7 +50,20 @@ inside_board(X-Y, Size) :-
     inside_line(X, Y, Size),
     inside_line(Y, X, Size).
 
+% -----------------------------------------
+
 new_pos(X-Y, 1, X-NewY) :- NewY is Y - 1.
 new_pos(X-Y, 2, X-NewY) :- NewY is Y + 1.
 new_pos(X-Y, 3, NewX-Y) :- NewX is X - 1.
 new_pos(X-Y, 4, NewX-Y) :- NewX is X + 1.
+
+% -----------------------------------------
+
+replace(Pos, Element, List, NewList) :-
+    nth1(Pos, List, _, Rest),
+    nth1(Pos, NewList, Element, Rest).
+
+
+update_piece_pos(Piece, OldPos, NewPos) :-
+    retract(position(Piece, OldPos)),
+    asserta(position(Piece, NewPos)).

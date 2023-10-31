@@ -177,7 +177,6 @@ display_row([Element|Rest]) :-
 
 % -----------------------------------------
 
-
 color(r-_, 33) :- !.
 color(_-p1, 34) :- !.
 color(_-p2, 31) :- !.
@@ -188,4 +187,15 @@ display_element(x-x) :- write('|   '), !.
 display_element(X-Y) :- 
     color(X-Y, ColorCode),
     (ColorCode \= 0 -> format('| \e[~dm~w\e[0m ', [ColorCode, X]); write('    ')).
-    
+
+% -----------------------------------------
+
+put_piece(Board, Piece, X-Y, NewBoard) :-
+    nth1(Y, Board, Row),
+    replace(X, Piece, Row, NewRow),
+    replace(Y, NewRow, Board, NewBoard).
+
+swap_places(Board, Piece1, Pos1, Piece2, Pos2, NewBoard) :-
+    put_piece(Board, Piece1, Pos2, Temp),
+    put_piece(Temp, Piece2, Pos1, NewBoard).
+

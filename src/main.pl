@@ -63,16 +63,16 @@ choose_direction(D):-
 
 % -----------------------------------------
 
-choose_move([Board, Player, _, _], _Move) :-
+choose_move([Board, Player, _, _], Piece-Direction) :-
     \+computer_level(Player, _),      
     length(Board, Size),
     repeat,
     choose_piece(Piece),
     position(Piece-Player, X-Y),
     format('Original position: (~d, ~d)\n', [X, Y]),
-    choose_direction(D),
+    choose_direction(Direction),
    
-    (valid_move(Piece-Player, X-Y, Size, D) -> true ; 
+    (valid_move(Piece-Player, X-Y, Size, Direction) -> true ; 
     format('Please input a valid move: ', []), fail).
 
 choose_move([Board,Player,_,_], Move):-
@@ -81,12 +81,16 @@ choose_move([Board,Player,_,_], Move):-
 
 % -----------------------------------------
 
-valid_move(Piece-Player, X-Y, Size, D) :-
-    new_pos(X-Y, D, NewX-NewY),
+valid_move(Piece-Player, X-Y, Size, Direction) :-
+    new_pos(X-Y, Direction, NewX-NewY),
     inside_board(NewX-NewY, Size), 
     \+ position(_-_, NewX-NewY).
 
-move(_GameState, _Move, _NewGameState) :-
+move([Board, Player, _, _], Piece-Direction, [NewBoard, Player, _, _]) :-
+    position(Piece-Player, X-Y),
+    new_pos(X-Y, Direction, NewX-NewY),
+    update_piece_pos(Piece-Player, X-Y, NewX-NewY),
+    swap_places(Board, Piece-Player, X-Y, x-x, NewX-NewY, NewBoard),
     write('Moving pieces...\n').
 
 update_position(Piece-Player, X-Y) :-
@@ -108,8 +112,9 @@ game_cycle(GameState) :-
 
 game_cycle(GameState) :-
     display_game(GameState),
-    choose_move(GameState, _Move).
-    /*move(GameState, Move, NewGameState).
+    choose_move(GameState, Move),
+    move(GameState, Move, NewGameState),
+    game_cycle(NewGameState).
     % next_player(Player, NextPlayer), !,
     % game_cycle(NewGameState).*/
 
