@@ -81,28 +81,6 @@ choose_move([Board,Player,_,_], Move):-
 
 % -----------------------------------------
 
-pull_rock(Troll, Direction) :- 
-    position(Troll, X-Y),
-    opposite_direction(Direction, NewD),
-    new_pos(X-Y, NewD, A-B),
-    position(r-_, A-B),
-    format('I should move the rock in (~d, ~d)\n', [A, B]).
-
-pull_rock_option(Player, X-Y, Direction):-
-    write('Do you want to pull the rock right behind the Stonetroll?\n\n'),
-    write('[1] Yes\n'),
-    write('[2] No\n\n'),
-    select_option(1,2, Option),
-    (Option == 1 -> pull_rock(t-Player, Direction); true).
-
-
-troll_valid_move(Player, X-Y, Direction) :-
-    opposite_direction(Direction, NewD),
-    new_pos(X-Y, NewD, A-B),
-    (position(r-_, A-B) -> 
-        pull_rock_option(Player, X-Y, Direction)
-    ; 
-    \+ position(_-_, A-B)).
 
 general_valid_move(NewX-NewY) :-
     \+ position(_-_, NewX-NewY).
@@ -110,15 +88,39 @@ general_valid_move(NewX-NewY) :-
 valid_move(Piece-Player, X-Y, Size, Direction) :-
     new_pos(X-Y, Direction, NewX-NewY),
     inside_board(NewX-NewY, Size),
-    (Piece == t -> troll_valid_move(Player, X-Y, Direction) ; 
-    general_valid_move(NewX-NewY)).
+    general_valid_move(NewX-NewY).
 
+general_move(Board, Piece, Pos, NewPos, NewBoard):-
+    update_piece_pos(Piece, Pos, NewPos),
+    swap_places(Board, Piece, Pos, x-x, NewPos, NewBoard).
+
+pull_rock_option(Option):-
+    write('Do you want to pull the rock right behind the Stonetroll?\n\n'),
+    write('[1] Yes\n'),
+    write('[2] No\n\n'),
+    select_option(1, 2, Option).   
+
+pull_rock(Board, Position, Troll, Direction, NewBoard) :-
+    opposite_direction(Direction, NewD), new_pos(Position, NewD, A-B), position(Rock, A-B),
+    new_pos(Position, Direction, NewPos),
+    update_piece_pos(Troll, Position, NewPos),
+    swap_places(Board, Troll, Position, x-x, NewPos, Temp),
+    swap_places(Temp, Rock, A-B, x-x, Position, NewBoard).
 
 move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
     position(Piece-Player, X-Y),
     new_pos(X-Y, Direction, NewX-NewY),
-    update_piece_pos(Piece-Player, X-Y, NewX-NewY),
-    swap_places(Board, Piece-Player, X-Y, x-x, NewX-NewY, NewBoard),
+    
+   (Piece == t, opposite_direction(Direction, NewD), new_pos(X-Y, NewD, A-B), position(r-_, A-B) ->
+        pull_rock_option(Option),
+        ( Option == 1 ->
+            pull_rock(Board, X-Y, Piece-Player, Direction, NewBoard)
+            ;
+            general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard)
+        );
+        general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard)),
+
+
     (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 
     Turns = 2, Moves = 2, NrTurns is 3, next_player(Player, NewPlayer), NrMoves is 1;   
     Moves < 3, NrMoves is Moves + 1, NewPlayer = Player, NrTurns is Turns;   
