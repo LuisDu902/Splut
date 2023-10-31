@@ -67,3 +67,10 @@ replace(Pos, Element, List, NewList) :-
 update_piece_pos(Piece, OldPos, NewPos) :-
     retract(position(Piece, OldPos)),
     asserta(position(Piece, NewPos)).
+
+% -----------------------------------------
+
+next_player(p1, p2).
+
+next_player(p2, p1).
+

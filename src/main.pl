@@ -86,12 +86,15 @@ valid_move(Piece-Player, X-Y, Size, Direction) :-
     inside_board(NewX-NewY, Size), 
     \+ position(_-_, NewX-NewY).
 
-move([Board, Player, _, _], Piece-Direction, [NewBoard, Player, _, _]) :-
+move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
     position(Piece-Player, X-Y),
     new_pos(X-Y, Direction, NewX-NewY),
     update_piece_pos(Piece-Player, X-Y, NewX-NewY),
     swap_places(Board, Piece-Player, X-Y, x-x, NewX-NewY, NewBoard),
-    write('Moving pieces...\n').
+    (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 
+    Turns = 2, Moves = 2, NrTurns is 3, next_player(Player, NewPlayer), NrMoves is 1;   
+    Moves < 3, NrMoves is Moves + 1, NewPlayer = Player, NrTurns is Turns;   
+    NrTurns is Turns + 1, next_player(Player, NewPlayer), NrMoves is 1).
 
 update_position(Piece-Player, X-Y) :-
     retract(position(Piece-Player, _-_)),
@@ -99,10 +102,9 @@ update_position(Piece-Player, X-Y) :-
 
 % -----------------------------------------
 
-next_player(_Player, _NextPlayer) :-
-    write('Passing turn\n').
-
-% -----------------------------------------
+display_turn([_, Player, NrMoves, _]):-
+    player_name(Player, Name),
+    format('\nYour turn to play, ~a! This is your move nr ~d \n\n', [Name, NrMoves]). 
 
 /*
 game_cycle(GameState) :-
@@ -111,12 +113,11 @@ game_cycle(GameState) :-
 */
 
 game_cycle(GameState) :-
+    display_turn(GameState),
     display_game(GameState),
     choose_move(GameState, Move),
     move(GameState, Move, NewGameState),
     game_cycle(NewGameState).
-    % next_player(Player, NextPlayer), !,
-    % game_cycle(NewGameState).*/
 
 % -----------------------------------------
 

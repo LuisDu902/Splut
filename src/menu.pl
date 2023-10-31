@@ -77,5 +77,5 @@ menu(GameState) :-
     initial_state(Size, GameState).
 
 
-initial_state(Size, [Board, p1, 0, 0]):-
+initial_state(Size, [Board, p1, 1, 1]):-
     create_board(Size, Board).
