@@ -113,19 +113,29 @@ pull_rock(Board, Position, Troll, Direction, NewBoard) :-
 
 % -----------------------------------------
 
-move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
-    position(Piece-Player, X-Y),
+troll_move(Board, Piece-Player, X-Y, Direction, NewBoard):-
     new_pos(X-Y, Direction, NewX-NewY),
-    
-   (Piece == t, opposite_direction(Direction, NewD), new_pos(X-Y, NewD, A-B), position(r-_, A-B) ->
+    (opposite_direction(Direction, NewD), new_pos(X-Y, NewD, A-B), position(r-_, A-B) ->
         pull_rock_option(Option),
         ( Option == 1 ->
             pull_rock(Board, X-Y, Piece-Player, Direction, NewBoard)
             ;
             general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard)
-        );
-        general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard)),
+        )
+    ;
+    general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard)
+).
 
+
+move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
+    position(Piece-Player, X-Y),
+    new_pos(X-Y, Direction, NewX-NewY),
+    
+    (
+        Piece == t -> troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
+        Piece == s -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard) ;
+        Piece == d -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard)
+    ),
 
     (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 
     Turns = 2, Moves = 2, NrTurns is 3, next_player(Player, NewPlayer), NrMoves is 1;   
