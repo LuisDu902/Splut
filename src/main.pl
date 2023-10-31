@@ -81,7 +81,6 @@ choose_move([Board,Player,_,_], Move):-
 
 % -----------------------------------------
 
-
 general_valid_move(NewX-NewY) :-
     \+ position(_-_, NewX-NewY).
 
@@ -90,9 +89,13 @@ valid_move(Piece-Player, X-Y, Size, Direction) :-
     inside_board(NewX-NewY, Size),
     general_valid_move(NewX-NewY).
 
+% -----------------------------------------
+
 general_move(Board, Piece, Pos, NewPos, NewBoard):-
     update_piece_pos(Piece, Pos, NewPos),
     swap_places(Board, Piece, Pos, x-x, NewPos, NewBoard).
+
+% -----------------------------------------
 
 pull_rock_option(Option):-
     write('Do you want to pull the rock right behind the Stonetroll?\n\n'),
@@ -107,6 +110,8 @@ pull_rock(Board, Position, Troll, Direction, NewBoard) :-
     update_piece_pos(Rock, A-B, Position),
     swap_places(Board, Troll, Position, x-x, NewPos, Temp),
     swap_places(Temp, Rock, A-B, x-x, Position, NewBoard).
+
+% -----------------------------------------
 
 move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
     position(Piece-Player, X-Y),
@@ -127,11 +132,8 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMov
     Moves < 3, NrMoves is Moves + 1, NewPlayer = Player, NrTurns is Turns;   
     NrTurns is Turns + 1, next_player(Player, NewPlayer), NrMoves is 1).
 
-update_position(Piece-Player, X-Y) :-
-    retract(position(Piece-Player, _-_)),
-    asserta(position(Piece-Player, X-Y)).
-
 % -----------------------------------------
+
 
 display_turn([_, Player, NrMoves, _]):-
     player_name(Player, Name),
