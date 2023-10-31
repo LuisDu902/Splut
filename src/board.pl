@@ -42,7 +42,7 @@ create_row(Index, Size, Row):-
     Index is Size-1,
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    B = [s-p1, d-p1, t-p1],
+    B = [s-p1, t-p1, d-p1],
     append([A, B, A], Row), 
     assert_pieces(B, Index, Padding), !.
 

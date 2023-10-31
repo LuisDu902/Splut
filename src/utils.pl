@@ -71,6 +71,9 @@ update_piece_pos(Piece, OldPos, NewPos) :-
 % -----------------------------------------
 
 next_player(p1, p2).
-
 next_player(p2, p1).
 
+opposite_direction(1, 2).
+opposite_direction(2, 1).
+opposite_direction(3, 4).
+opposite_direction(4, 3).

@@ -81,10 +81,38 @@ choose_move([Board,Player,_,_], Move):-
 
 % -----------------------------------------
 
+pull_rock(Troll, Direction) :- 
+    position(Troll, X-Y),
+    opposite_direction(Direction, NewD),
+    new_pos(X-Y, NewD, A-B),
+    position(r-_, A-B),
+    format('I should move the rock in (~d, ~d)\n', [A, B]).
+
+pull_rock_option(Player, X-Y, Direction):-
+    write('Do you want to pull the rock right behind the Stonetroll?\n\n'),
+    write('[1] Yes\n'),
+    write('[2] No\n\n'),
+    select_option(1,2, Option),
+    (Option == 1 -> pull_rock(t-Player, Direction); true).
+
+
+troll_valid_move(Player, X-Y, Direction) :-
+    opposite_direction(Direction, NewD),
+    new_pos(X-Y, NewD, A-B),
+    (position(r-_, A-B) -> 
+        pull_rock_option(Player, X-Y, Direction)
+    ; 
+    \+ position(_-_, A-B)).
+
+general_valid_move(NewX-NewY) :-
+    \+ position(_-_, NewX-NewY).
+
 valid_move(Piece-Player, X-Y, Size, Direction) :-
     new_pos(X-Y, Direction, NewX-NewY),
-    inside_board(NewX-NewY, Size), 
-    \+ position(_-_, NewX-NewY).
+    inside_board(NewX-NewY, Size),
+    (Piece == t -> troll_valid_move(Player, X-Y, Direction) ; 
+    general_valid_move(NewX-NewY)).
+
 
 move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
     position(Piece-Player, X-Y),
