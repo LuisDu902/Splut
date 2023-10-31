@@ -34,10 +34,46 @@ select_option(Min, Max, Option) :-
     format('Invalid input. Please enter a number between ~d and ~d: ', [Min, Max]), fail).
 
 select_board(Size) :-
-    write('Size : '),
     repeat,
     read_number_input(Size),
     ((Size > 7 , Size mod 2 =:= 1) -> true ; 
     format('Invalid input. Please enter an odd number greater than 7: ', []), fail).
 
 % -----------------------------------------
+
+inside_line(Line, Pos, Size) :-
+    Starting is abs((Size + 1) // 2 - Line) + 1, 
+    Ending is Size - Starting + 1,
+    between(Starting, Ending, Pos).
+
+inside_board(X-Y, Size) :-
+    inside_line(X, Y, Size),
+    inside_line(Y, X, Size).
+
+% -----------------------------------------
+
+new_pos(X-Y, 1, X-NewY) :- NewY is Y - 1.
+new_pos(X-Y, 2, X-NewY) :- NewY is Y + 1.
+new_pos(X-Y, 3, NewX-Y) :- NewX is X - 1.
+new_pos(X-Y, 4, NewX-Y) :- NewX is X + 1.
+
+% -----------------------------------------
+
+replace(Pos, Element, List, NewList) :-
+    nth1(Pos, List, _, Rest),
+    nth1(Pos, NewList, Element, Rest).
+
+
+update_piece_pos(Piece, OldPos, NewPos) :-
+    retract(position(Piece, OldPos)),
+    asserta(position(Piece, NewPos)).
+
+% -----------------------------------------
+
+next_player(p1, p2).
+next_player(p2, p1).
+
+opposite_direction(1, 2).
+opposite_direction(2, 1).
+opposite_direction(3, 4).
+opposite_direction(4, 3).

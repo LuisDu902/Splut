@@ -1,4 +1,5 @@
 :- dynamic player_name/2.
+:- dynamic computer_level/2.
 
 % -----------------------------------------
 
@@ -20,18 +21,21 @@ mode_menu :-
 
 game_mode(1) :-
     write('\nPlaying Human vs Human\n'),
-    choose_name(player1),
-    choose_name(player2).
+    choose_name(p1),
+    choose_name(p2).
 
 game_mode(2) :-
     write('\nPlaying Human vs Computer\n'),
-    choose_name(player1),
-    asserta((player_name(player2, 'Computer'))).
+    choose_name(p1),
+    asserta((player_name(p2, 'Computer'))),
+    choose_level(p2).
 
 game_mode(3) :-
     write('\nPlaying Bot vs Bot\n'),
-    asserta((player_name(player1, 'Computer1'))),
-    asserta((player_name(player2, 'Computer2'))).
+    asserta((player_name(p1, 'Computer1'))),
+    asserta((player_name(p2, 'Computer2'))),
+    choose_level(p1),
+    choose_level(p2).
 
 % -----------------------------------------
 
@@ -49,20 +53,29 @@ choose_name(Player):-
 
 % -----------------------------------------
 
+choose_level(Computer) :-
+    format('\nChoose the level of difficulty for ~a:\n', Computer),
+    write('[1] Random valid move\n'),
+    write('[2] Best move at the time (greedy)\n\n'),
+    select_option(1, 2, Level),
+    asserta((computer_level(Computer, Level))).
+
+
 select_board_size :-
     write('\nChoose the board size (odd number greater than 7): ').
 
 % -----------------------------------------
 
-choose_board(Board) :-
+choose_board_size(Size):-
     select_board_size,
-    select_board(Size),
-    create_board(Size, Board).
+    select_board(Size).
 
-% -----------------------------------------
-
-menu([Board, Player, [], 0]) :-
+menu(GameState) :-
     welcome_message,
     choose_mode,
-    choose_board(Board),
-    Player = player1.
+    choose_board_size(Size),
+    initial_state(Size, GameState).
+
+
+initial_state(Size, [Board, p1, 1, 1]):-
+    create_board(Size, Board).

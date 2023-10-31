@@ -1,3 +1,4 @@
+
 # Implementation of Splut! in Prolog
 
 This project was developed for the course Functional and Logic Programming, with the aim of implementing a two-player board game in the Prolog language. The board game is defined by its distinctive board and pieces, the rules governing piece movement (including possible moves), and the conditions that determine the game's outcome, whether it results in defeat or victory.
@@ -72,6 +73,7 @@ The objective of Splut! is to eliminate all opposing Sorcerers by landing a Rock
 - **Levitating Rocks:** Sorcerers can levitate stationary Rocks to an empty square in the same direction as their movement. Levitation is optional but continuous during a turn.
 
 
+
 ## Game Logic
 
 ### Internal Game State Representation
@@ -104,3 +106,4 @@ To maintain the integrity of the system, we have implemented robust input valida
 - in **(3)**, the predicate **select_board/1** prompts the user for a board size, ensuring that the input is an odd number greater than 7.
 
 Moving on to the game playing state, the board is displayed using **display_game/1**
+

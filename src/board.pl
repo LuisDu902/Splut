@@ -1,3 +1,5 @@
+:- dynamic position/2.
+
 % -----------------------------------------
 
 create_list(0, [], _).
@@ -9,32 +11,48 @@ create_list(Size, [Elem|Rest], Elem) :-
 
 % -----------------------------------------
 
+assert_pieces([], _, _).
+assert_pieces([Piece|Rest], Row, Col) :-
+    NextCol is Col+1,
+    asserta(position(Piece, NextCol-Row)),
+    assert_pieces(Rest, Row, NextCol).
+
 create_row(1, Size, Row):-
     Padding is (Size - 1 ) // 2,
     create_list(Padding, A, e-e),
-    append([A, [r-1], A], Row), !.
+    B = [r-1],
+    append([A, B, A], Row),   
+    assert_pieces(B, 1, Padding), !.
 
 create_row(Size, Size, Row):-
     Padding is (Size - 1 ) // 2,
     create_list(Padding, A, e-e),
-    append([A, [r-4], A], Row), !.
+    B = [r-4],
+    append([A, B, A], Row), 
+    assert_pieces(B, Size, Padding), !.
 
 create_row(2, Size, Row):-
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    append([A, [t-2, d-2, s-2], A], Row), !.
+    B = [t-p2, d-p2, s-p2],
+    append([A, B, A], Row),
+    assert_pieces(B, 2, Padding), !.
 
 create_row(Index, Size, Row):-
     Index is Size-1,
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    append([A, [s-1, d-1, t-1], A], Row), !.
+    B = [s-p1, d-p1, t-p1],
+    append([A, B, A], Row), 
+    assert_pieces(B, Index, Padding), !.
 
 create_row(Index, Size, Row):-
     Index is (Size+1) // 2,
     Empty is Size - 2,
     create_list(Empty, A, x-x),
-    append([[r-2], A, [r-3]], Row), !.
+    append([[r-2], A, [r-3]], Row), 
+    asserta(position(r-2, 1-Index)),
+    asserta(position(r-3, Size-Index)), !.
 
 create_row(Index, Size, Row):-
     Padding is abs((Size + 1) // 2 - Index),
@@ -159,10 +177,9 @@ display_row([Element|Rest]) :-
 
 % -----------------------------------------
 
-
 color(r-_, 33) :- !.
-color(_-1, 34) :- !.
-color(_-2, 31) :- !.
+color(_-p1, 34) :- !.
+color(_-p2, 31) :- !.
 color(_-_, 0) :- !.
 
 display_element(x-x) :- write('|   '), !.
@@ -170,4 +187,15 @@ display_element(x-x) :- write('|   '), !.
 display_element(X-Y) :- 
     color(X-Y, ColorCode),
     (ColorCode \= 0 -> format('| \e[~dm~w\e[0m ', [ColorCode, X]); write('    ')).
-    
+
+% -----------------------------------------
+
+put_piece(Board, Piece, X-Y, NewBoard) :-
+    nth1(Y, Board, Row),
+    replace(X, Piece, Row, NewRow),
+    replace(Y, NewRow, Board, NewBoard).
+
+swap_places(Board, Piece1, Pos1, Piece2, Pos2, NewBoard) :-
+    put_piece(Board, Piece1, Pos2, Temp),
+    put_piece(Temp, Piece2, Pos1, NewBoard).
+
