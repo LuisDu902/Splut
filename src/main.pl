@@ -104,6 +104,7 @@ pull_rock(Board, Position, Troll, Direction, NewBoard) :-
     opposite_direction(Direction, NewD), new_pos(Position, NewD, A-B), position(Rock, A-B),
     new_pos(Position, Direction, NewPos),
     update_piece_pos(Troll, Position, NewPos),
+    update_piece_pos(Rock, A-B, Position),
     swap_places(Board, Troll, Position, x-x, NewPos, Temp),
     swap_places(Temp, Rock, A-B, x-x, Position, NewBoard).
 
