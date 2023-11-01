@@ -5,7 +5,7 @@
 :- consult(menu).
 :- consult(utils).
 :- consult(board).
-:- consult(piece).
+:- consult(troll).
 
 % -----------------------------------------
 
@@ -103,14 +103,6 @@ general_move(Board, Piece, Pos, NewPos, NewBoard):-
     swap_places(Board, Piece, Pos, x-x, NewPos, NewBoard).
 
 % -----------------------------------------
-
-
-
-% -----------------------------------------
-
-
-
-
 
 move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
     position(Piece-Player, X-Y),

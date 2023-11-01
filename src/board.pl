@@ -34,7 +34,7 @@ create_row(Size, Size, Row):-
 create_row(2, Size, Row):-
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    B = [t-p2, d-p2, s-p2],
+    B = [d-p2, t-p2, s-p2],
     append([A, B, A], Row),
     assert_pieces(B, 2, Padding), !.
 
