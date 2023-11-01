@@ -114,7 +114,7 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMov
 
 % -----------------------------------------
 
-game_over(GameState, Winner) :-
+game_over(Winner) :-
     (\+ position(s-p1, _)) -> Winner = p2 ;
     (\+ position(s-p2, _)) -> Winner = p1 ;
     false.
@@ -129,8 +129,8 @@ display_turn([_, Player, NrMoves, _]):-
     player_name(Player, Name),
     format('\nYour turn to play, ~a! This is your move nr ~d \n\n', [Name, NrMoves]). 
 
-game_cycle(GameState) :-
-    game_over(GameState, Winner), !, 
+game_cycle(_) :-
+    game_over(Winner), !, 
     congratulate(Winner), !.
 
 game_cycle(GameState) :-

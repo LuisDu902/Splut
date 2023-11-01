@@ -95,6 +95,5 @@ find_elem([_|Tail], Elems, Index) :-
     Index is IndexTail + 1.
 
 find_reverse_elem(List, Elems, A) :-
-    length(List, Size),
     reverse(List, Reversed),
     find_elem(Reversed, Elems, A).

@@ -40,7 +40,7 @@ throw_rock_menu(Direction):-
     write('[4] Right\n\n'),
     select_option(1, 4, Direction).
 
-throw_rock_option(Board, T-Player, Position, Direction):-
+throw_rock_option(Board, _-Player, Position, Direction):-
     repeat,
     throw_rock_menu(Direction),
     (valid_throw_direction(Board, Player, Position, Direction) -> true;
@@ -78,7 +78,7 @@ move_rock(Board, Rock, Direction, NewBoard):-
     position(Rock, X-Y),
     length(Board, Size),
     ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
-      nth1(Y, Board, List), R is Size - X, get_remaining(X, List, Size, Rest, Direction)),
+      nth1(Y, Board, List), get_remaining(X, List, Size, Rest, Direction)),
     new_rock_pos(Rest, X-Y, Direction, NewX-NewY),
     format('THE ROCK SHOULD GO FROM (~d,~d) TO (~d,~d)\n', [X, Y, NewX, NewY]),
     (position(Piece, NewX-NewY) -> retract(position(Piece, NewX-NewY)); true),
