@@ -42,7 +42,7 @@ create_row(Index, Size, Row):-
     Index is Size-1,
     Padding is (Size - 3) // 2,
     create_list(Padding, A, e-e),
-    B = [s-p1, d-p1, t-p1],
+    B = [s-p1, t-p1, d-p1],
     append([A, B, A], Row), 
     assert_pieces(B, Index, Padding), !.
 
@@ -195,7 +195,15 @@ put_piece(Board, Piece, X-Y, NewBoard) :-
     replace(X, Piece, Row, NewRow),
     replace(Y, NewRow, Board, NewBoard).
 
+% -----------------------------------------
+
 swap_places(Board, Piece1, Pos1, Piece2, Pos2, NewBoard) :-
     put_piece(Board, Piece1, Pos2, Temp),
     put_piece(Temp, Piece2, Pos1, NewBoard).
 
+% -----------------------------------------
+
+get_col(_, [], []).
+get_col(N, [Row|Rest], [Element|Column]) :-
+    nth1(N, Row, Element),
+    get_col(N, Rest, Column).

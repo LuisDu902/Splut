@@ -77,3 +77,24 @@ opposite_direction(1, 2).
 opposite_direction(2, 1).
 opposite_direction(3, 4).
 opposite_direction(4, 3).
+
+
+
+skip_elem([Head|_], Elems, 1) :-
+    \+ member(Head, Elems).
+
+skip_elem([_|Tail], Elems, Index) :-
+    skip_elem(Tail, Elems, IndexTail),
+    Index is IndexTail + 1.
+
+
+find_elem([Elem|_], Elems, 0) :-
+    member(Elem, Elems).
+find_elem([_|Tail], Elems, Index) :-
+    find_elem(Tail, Elems, IndexTail),
+    Index is IndexTail + 1.
+
+find_reverse_elem(List, Elems, A) :-
+    length(List, Size),
+    reverse(List, Reversed),
+    find_elem(Reversed, Elems, A).
