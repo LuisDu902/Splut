@@ -7,13 +7,6 @@
 :- consult(board).
 :- consult(troll).
 
-% -----------------------------------------
-
-game_over(_GameState, _Winner):-
-    write('The game is over\n').
-
-congratulate(_Winner):-
-    write('You won the game\n').
 
 % -----------------------------------------
 
@@ -121,20 +114,28 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMov
 
 % -----------------------------------------
 
+game_over(GameState, Winner) :-
+    (\+ position(s-p1, _)) -> Winner = p2 ;
+    (\+ position(s-p2, _)) -> Winner = p1 ;
+    false.
+
+congratulate(Winner):-
+    player_name(Winner, Name),
+    format('\nCongrats ~a! You won the game.\n', [Name]).
+
+% -----------------------------------------
 
 display_turn([_, Player, NrMoves, _]):-
     player_name(Player, Name),
     format('\nYour turn to play, ~a! This is your move nr ~d \n\n', [Name, NrMoves]). 
 
-/*
 game_cycle(GameState) :-
     game_over(GameState, Winner), !, 
-    congratulate(Winner).
-*/
+    congratulate(Winner), !.
 
 game_cycle(GameState) :-
-    display_turn(GameState),
-    display_game(GameState),
+    display_turn(GameState), !,
+    display_game(GameState), !,
     choose_move(GameState, Move),
     move(GameState, Move, NewGameState),
     game_cycle(NewGameState).
@@ -143,4 +144,4 @@ game_cycle(GameState) :-
 
 play :- 
     menu(GameState), !,
-    game_cycle(GameState).
+    game_cycle(GameState), !.
