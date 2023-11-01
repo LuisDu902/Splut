@@ -50,31 +50,21 @@ troll_move(Board, Troll, Pos, Direction, NewBoard) :-
     (opposite_direction(Direction, NewD), new_pos(Pos, NewD, A-B), position(r-_, A-B) ->
         pull_rock_option(Option),
         (Option == 1 ->
-            pull_rock(Board, Pos, Troll, Direction, NewBoard)
-            ;
-           
+            pull_rock(Board, Pos, Troll, Direction, NewBoard) ;
             general_move(Board, Troll, Pos, NewPos, NewBoard)
-        )
-        ;
+        );
         general_move(Board, Troll, Pos, NewPos, NewBoard)
     )).
 
 move_rock(Board, Rock, Direction, NewBoard):-
     position(Rock, X-Y),
     length(Board, Size),
-    (   (Direction =:= 1; Direction =:= 2) ->
-        get_col(X, Board, List),
-        get_remaining(Y, List, Size, Rest, Direction)
-    ;   nth1(Y, Board, List),
-        R is Size - X, 
-        get_remaining(X, List, Size, Rest, Direction)
-    ),
+    ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
+      nth1(Y, Board, List), R is Size - X, get_remaining(X, List, Size, Rest, Direction)),
     new_rock_pos(Rest, X-Y, Direction, NewX-NewY),
     format('THE ROCK SHOULD GO FROM (~d,~d) TO (~d,~d)\n', [X, Y, NewX, NewY]),
-
     update_piece_pos(Rock, X-Y, NewX-NewY), !,
     put_piece(Board, Rock, NewX-NewY, NewBoard).
-
 
 new_rock_pos([], Pos, _, Pos).
 
@@ -104,7 +94,6 @@ new_rock_pos(List, X-Y, 4, NewX-NewY):-
 
 get_remaining(N, List, Size, Rest, Direction):-
     format('DIRECTION IS ~d\n', [Direction]),
-    
     (   (Direction =:= 2; Direction =:= 4) ->
         Len is Size - N,
         format('It is starting in ~d with length ~d\n', [N, Len]),
@@ -112,13 +101,4 @@ get_remaining(N, List, Size, Rest, Direction):-
     ;   Len is N - 1,
         format('It is starting at 0 with length ~d\n', [Len]),
         sublist(List, Rest, 0, Len, _)
-    ),
-    print_list(Rest),
-    nl, nl.
-
-
-print_list([]).
-print_list([Head|Tail]) :-
-    write(Head),
-    write(' '),
-    print_list(Tail).
+    ).
