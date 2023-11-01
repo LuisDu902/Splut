@@ -17,25 +17,42 @@ pull_rock_option(Option):-
 pull_rock(Board, Position, Troll, Direction, NewBoard) :-
     opposite_direction(Direction, NewD), new_pos(Position, NewD, A-B), position(Rock, A-B),
     new_pos(Position, Direction, NewPos),
-    update_piece_pos(Troll, Position, NewPos),
-    update_piece_pos(Rock, A-B, Position),
+    update_piece_pos(Troll, NewPos),
+    update_piece_pos(Rock, Position),
     swap_places(Board, Troll, Position, x-x, NewPos, Temp),
     swap_places(Temp, Rock, A-B, x-x, Position, NewBoard).
 
 % ----------------------------------------
 
-throw_rock_option(Direction):-
-    write('You have found a rock! Which direction do you want to throw it?\n\n'),
+throw_rock_menu(Direction):-
+    write('\nYou have found a rock! Which direction do you want to throw it?\n\n'),
     write('[1] Up\n'),
     write('[2] Down\n'),
     write('[3] Left\n'),
     write('[4] Right\n\n'),
-    select_option(1, 4, Direction).   
+    select_option(1, 4, Direction).
+
+throw_rock_option(Board, T-Player, Position, Direction):-
+    repeat,
+    throw_rock_menu(Direction),
+    (valid_throw_direction(Board, Player, Position, Direction) -> true;
+        write('You cannot throw in this direction! Choose a valid direction: '),
+        fail
+    ).
+
+valid_throw_direction(Board, Player, Position, Direction) :-
+    length(Board, Size),
+    new_pos(Position, Direction, NewPos),
+    inside_board(NewPos, Size),
+    next_player(Player, P),
+    \+ position(r-_, NewPos),
+    \+ position(t-P, NewPos).
+
 
 throw_rock(Board, Pos, Troll, Dir, ThrowDir, NewBoard) :-
     new_pos(Pos, Dir, NewPos),
     position(Rock, NewPos),
-    update_piece_pos(Troll, Pos, NewPos),
+    update_piece_pos(Troll, NewPos),
     swap_places(Board, Troll, Pos, x-x, NewPos, Tmp),
     move_rock(Tmp, Rock, ThrowDir, NewBoard).
 
@@ -44,7 +61,7 @@ throw_rock(Board, Pos, Troll, Dir, ThrowDir, NewBoard) :-
 troll_move(Board, Troll, Pos, Direction, NewBoard) :-
     new_pos(Pos, Direction, NewPos),
     (position(r-_, NewPos) ->
-        throw_rock_option(ThrowDir),
+        throw_rock_option(Board, Troll, NewPos, ThrowDir),
         throw_rock(Board, Pos, Troll, Direction, ThrowDir, NewBoard)
     ;
     (opposite_direction(Direction, NewD), new_pos(Pos, NewD, A-B), position(r-_, A-B) ->
@@ -63,7 +80,7 @@ move_rock(Board, Rock, Direction, NewBoard):-
       nth1(Y, Board, List), R is Size - X, get_remaining(X, List, Size, Rest, Direction)),
     new_rock_pos(Rest, X-Y, Direction, NewX-NewY),
     format('THE ROCK SHOULD GO FROM (~d,~d) TO (~d,~d)\n', [X, Y, NewX, NewY]),
-    update_piece_pos(Rock, X-Y, NewX-NewY), !,
+    update_piece_pos(Rock, NewX-NewY), !,
     put_piece(Board, Rock, NewX-NewY, NewBoard).
 
 new_rock_pos([], Pos, _, Pos).

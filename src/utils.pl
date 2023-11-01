@@ -64,8 +64,8 @@ replace(Pos, Element, List, NewList) :-
     nth1(Pos, NewList, Element, Rest).
 
 
-update_piece_pos(Piece, OldPos, NewPos) :-
-    retract(position(Piece, OldPos)),
+update_piece_pos(Piece, NewPos) :-
+    retract(position(Piece, _)),
     asserta(position(Piece, NewPos)).
 
 % -----------------------------------------

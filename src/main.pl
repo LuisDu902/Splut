@@ -99,7 +99,7 @@ valid_move(Piece-Player, Pos, Size, Direction) :-
 % -----------------------------------------
 
 general_move(Board, Piece, Pos, NewPos, NewBoard):-
-    update_piece_pos(Piece, Pos, NewPos),
+    update_piece_pos(Piece, NewPos),
     swap_places(Board, Piece, Pos, x-x, NewPos, NewBoard).
 
 % -----------------------------------------
