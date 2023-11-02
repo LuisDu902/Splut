@@ -34,18 +34,21 @@ create_row(1, Size, Row):-
     B = [r-1],
     append([A, B, A], Row),   
     assert_pieces(B, 1, Padding), !.
+
 create_row(Size, Size, Row):-
     Padding is (Size - 1 ) // 2,
     create_list(Padding, e-e, A),
     B = [r-4],
     append([A, B, A], Row), 
     assert_pieces(B, Size, Padding), !.
+
 create_row(2, Size, Row):-
     Padding is (Size - 3) // 2,
     create_list(Padding, e-e, A),
     B = [d-p2, t-p2, s-p2],
     append([A, B, A], Row),
     assert_pieces(B, 2, Padding), !.
+
 create_row(Index, Size, Row):-
     Index is Size-1,
     Padding is (Size - 3) // 2,
@@ -53,6 +56,7 @@ create_row(Index, Size, Row):-
     B = [s-p1, t-p1, d-p1],
     append([A, B, A], Row), 
     assert_pieces(B, Index, Padding), !.
+
 create_row(Index, Size, Row):-
     Index is (Size+1) // 2,
     Empty is Size - 2,
@@ -60,6 +64,7 @@ create_row(Index, Size, Row):-
     append([[r-2], A, [r-3]], Row), 
     asserta(position(r-2, 1-Index)),
     asserta(position(r-3, Size-Index)), !.
+
 create_row(Index, Size, Row):-
     Padding is abs((Size + 1) // 2 - Index),
     Rest is Size - 2 * Padding,
@@ -79,6 +84,7 @@ create_board(Size, Board):-
 create_board_aux(Size, Size, AuxBoard, Board):-
     create_row(Size, Size, Row),
     append(AuxBoard, [Row], Board), !.
+
 create_board_aux(Index, Size, AuxBoard, Board):-
     Index < Size,
     create_row(Index, Size, Row),
@@ -102,8 +108,10 @@ display_board(Board) :-
 display_col_index(1, Size):-
     write('  1'),
     display_col_index(2, Size).
+
 display_col_index(Size, Size) :-
    (Size >= 10 ->  format('  ~d\n', [Size]) ; format('   ~d\n', [Size])).
+
 display_col_index(N, Size) :-
     N < Size,
    (N >= 10 -> format('  ~d', [N]) ; format('   ~d', [N])),
@@ -115,6 +123,7 @@ display_col_index(N, Size) :-
 % display_sep_line(+Index, +Size)
 % Displays a separator line for the game board.
 display_sep_line(0, _) :- write('|'), nl.
+
 display_sep_line(Size, Index) :-
     Middle is (Size + 1) / 2, 
     Index =< Middle, 
@@ -123,6 +132,7 @@ display_sep_line(Size, Index) :-
     display_padding(Padding),
     display_dashes(Dashes, Dashes),
     nl, !.
+
 display_sep_line(Size, Index) :-
     Middle is (Size + 1) // 2, 
     Dashes is Size - 2 * (Index - Middle - 1),
@@ -136,6 +146,7 @@ display_sep_line(Size, Index) :-
 % display_padding(+N)
 % Displays a specific number of padding spaces.
 display_padding(0).
+
 display_padding(N) :-
     N > 0,
     write('    '),
@@ -147,6 +158,7 @@ display_padding(N) :-
 % display_dashes(+N, +Dashes)
 % Displays a specific number of dashes for the separator line.
 display_dashes(0, _).
+
 display_dashes(N, N) :- 
     write(' ---'),
     NewN is N - 1,
@@ -162,6 +174,7 @@ display_dashes(N, Dashes) :-
 % display_rows(+Rows, +Size, +Index)
 % Displays the rows of the game board along with separator lines and row indices.
 display_rows([], Size, _) :- display_sep_line(Size, 1).
+
 display_rows([Row|Rest], Size, Index) :-
     display_sep_line(Size, Index),
     display_row(Row),
