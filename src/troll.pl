@@ -112,7 +112,6 @@ new_rock_pos(List, X-Y, 4, NewX-Y):-
     (position(s-_, TmpX-Y) -> NewX is TmpX; NewX is X + A).
 
 get_remaining(N, List, Size, Rest, Direction):-
-    format('DIRECTION IS ~d\n', [Direction]),
     (   (Direction =:= 2; Direction =:= 4) ->
         Len is Size - N,
         format('It is starting in ~d with length ~d\n', [N, Len]),

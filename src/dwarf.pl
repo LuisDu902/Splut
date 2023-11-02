@@ -7,7 +7,6 @@
 % the dwarf is the one performing the movement
 valid_dwarf_move(Board, X-Y, Direction):-
     new_pos(X-Y, Direction, NewPos),
-    write('here\n'),
     (\+ position(_-_, NewPos) -> true ; (can_push(Board, X-Y, Direction))).
 
 
@@ -16,10 +15,8 @@ valid_dwarf_move(Board, X-Y, Direction):-
 % to push things in the direction of the movement
 can_push(Board, X-Y, Direction) :-
     length(Board, Size),
-    write('fuck\n'),
     ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
       nth1(Y, Board, List), get_remaining(X, List, Size, Rest, Direction)),
-    write('nigga\n'),
     memberchk(x-x, Rest).
     
 % -----------------------------------------
@@ -29,26 +26,37 @@ can_push(Board, X-Y, Direction) :-
 % that he has to push the other pieces with him
 dwarf_move(Board, Dwarf, X-Y, Direction, NewBoard) :-
     new_pos(X-Y, Direction, NewPos),
-    write('balls\n'),
-    (position(_-_, NewPos) -> length(Board, Size),
-    write('this far\n'),
-    ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
-      nth1(Y, Board, List), get_remaining(X, List, Size, Rest, Direction)),
-    write('this further\n'),
-    push(Board, Rest, Direction, Temp),
-    general_move(Temp, Dwarf, X-Y, NewPos, NewBoard)
+    write('dwarf moving\n'),
+    (position(_-_, NewPos) -> 
+        write('pushing pieces\n'),
+        push(Board, X-Y, Direction, Temp),
+        general_move(Temp, Dwarf, X-Y, NewPos, NewBoard)
     ; general_move(Board, Dwarf, X-Y, NewPos, NewBoard)).
 
 
-% push(+Board, +[Elem | Rest], +Direction, -NewBoard) 
-% recursively updates the position of pieces in the way of the dwarf, 
-% considering the direction that he is pushing him to
-push(_, [], _, _).
+push(Board, X-Y, Direction, NewBoard):-
+   length(Board, Size),
+   ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
+   nth1(Y, Board, List), write('getting remaing list\n'), get_remaining(X, List, Size, Rest, Direction)),
+   write('Getting list : '),
+   print_list(Rest),
+   delete(Rest, x-x, Temp),
+   delete(Temp, e-e, Pieces),
+   write('Getting updated list : '),
+   print_list(Pieces),
+   push_pieces(Board, Pieces, Direction, NewBoard).
 
-push(Board, [Elem | Rest], Direction, NewBoard) :-
-    ((Elem \= x-x , Elem \= e-e) -> position(Elem, Pos),
-    new_pos(Pos, Direction, NewPos),
-    general_move(Board, Elem, Pos, NewPos, Temp), 
-    push(Temp, Rest, Direction, NewBoard)
-    ; push(Board, Rest, Direction, NewBoard)).
+push_pieces(Board, [], _, Board).
+push_pieces(Board, [Piece|Rest], Direction, NewBoard) :-
+    position(Piece, Pos),
+    new_pos(Pos, Direction, NewPos), 
+    update_piece_pos(Piece, NewPos),
+    put_piece(Board, Piece, NewPos, TempBoard),
+    push_pieces(TempBoard, Rest, Direction, NewBoard).
 
+
+print_list([]). 
+print_list([H|T]) :-
+    write(H), 
+    write(' '), 
+    print_list(T). 
