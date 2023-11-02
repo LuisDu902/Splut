@@ -6,6 +6,7 @@
 :- consult(utils).
 :- consult(board).
 :- consult(troll).
+:- consult(dwarf).
 
 
 % -----------------------------------------
@@ -36,13 +37,16 @@ choose_random_direction(D) :-
 
 % -----------------------------------------
 
-choose_piece(Piece):-
+choose_piece(Player, Piece):-
+    repeat,
     write('\nChoose the piece to move: \n'),
     write('[t] Stonetroll\n'),
     write('[d] Dwarf\n'),
     write('[s] Sorcerer\n\n'),
     write('Option: '),
-    get_char(Piece).
+    get_char(Piece),
+    skip_line,
+    (\+position(Piece-Player, _) -> write('\nThis piece is already dead!\n'), fail ; true).
 
 % -----------------------------------------
 
@@ -52,7 +56,6 @@ choose_direction(D):-
     write('[2] Down\n'),
     write('[3] Left\n'),
     write('[4] Right\n\n'),
-    skip_line,
     select_option(1, 4, D).
 
 % -----------------------------------------
@@ -61,12 +64,12 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
     \+computer_level(Player, _),      
     length(Board, Size),
     repeat,
-    choose_piece(Piece),
+    choose_piece(Player, Piece),
     position(Piece-Player, X-Y),
     format('Original position: (~d, ~d)\n', [X, Y]),
     choose_direction(Direction),
    
-    (valid_move(Piece-Player, X-Y, Size, Direction) -> true ; 
+    (valid_move(Board, Piece-Player, X-Y, Size, Direction) -> true ; 
     format('Please input a valid move: ', []), fail).
 
 choose_move([Board,Player,_,_], Move):-
@@ -79,13 +82,13 @@ choose_move([Board,Player,_,_], Move):-
 general_valid_move(NewPos) :-
     \+ position(_-_, NewPos).
 
-valid_move(Piece-Player, Pos, Size, Direction) :-
+valid_move(Board, Piece-Player, Pos, Size, Direction) :-
     new_pos(Pos, Direction, NewPos),
     inside_board(NewPos, Size),
     (
         Piece == t -> valid_troll_move(Pos, Direction);
         Piece == s -> general_valid_move(NewPos) ;
-        Piece == d -> general_valid_move(NewPos)
+        Piece == d -> valid_dwarf_move(Board, Pos, Direction)
     ).
 
 
@@ -104,7 +107,7 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMov
     (
         Piece == t -> troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
         Piece == s -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard) ;
-        Piece == d -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard)
+        Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
     ),
 
     (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 

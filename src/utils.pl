@@ -37,7 +37,7 @@ select_board(Size) :-
     repeat,
     read_number_input(Size),
     ((Size > 7 , Size mod 2 =:= 1) -> true ; 
-    format('Invalid input. Please enter an odd number greater than 7: ', []), fail).
+    write('Invalid input. Please enter an odd number greater than 7: '), fail).
 
 % -----------------------------------------
 
