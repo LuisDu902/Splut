@@ -37,13 +37,16 @@ choose_random_direction(D) :-
 
 % -----------------------------------------
 
-choose_piece(Piece):-
+choose_piece(Player, Piece):-
+    repeat,
     write('\nChoose the piece to move: \n'),
     write('[t] Stonetroll\n'),
     write('[d] Dwarf\n'),
     write('[s] Sorcerer\n\n'),
     write('Option: '),
-    get_char(Piece).
+    get_char(Piece),
+    skip_line,
+    (\+position(Piece-Player, _) -> write('\nThis piece is already dead!\n'), fail ; true).
 
 % -----------------------------------------
 
@@ -53,7 +56,6 @@ choose_direction(D):-
     write('[2] Down\n'),
     write('[3] Left\n'),
     write('[4] Right\n\n'),
-    skip_line,
     select_option(1, 4, D).
 
 % -----------------------------------------
@@ -62,7 +64,7 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
     \+computer_level(Player, _),      
     length(Board, Size),
     repeat,
-    choose_piece(Piece),
+    choose_piece(Player, Piece),
     position(Piece-Player, X-Y),
     format('Original position: (~d, ~d)\n', [X, Y]),
     choose_direction(Direction),
