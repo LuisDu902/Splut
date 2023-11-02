@@ -1,5 +1,5 @@
 % -----------------------------------------
-% |           Dwarf predicates           |
+% |           Dwarf predicates            |
 % -----------------------------------------
 
 % valid_dwarf_move(+Board, +Pos, +Direction)
@@ -40,12 +40,9 @@ push(Board, X-Y, Direction, NewBoard):-
    print_list(Pieces),
    push_pieces(Board, Pieces, Direction, NewBoard).
 
-% push_pieces(+Board, [], _, -Board)
-% Base case: If there are no more pieces to push, the NewBoard is the same as the current Board.
-push_pieces(Board, [], _, Board).
-
 % push_pieces(+Board, +[Piece|Rest], +Direction, -NewBoard)
 % Push the first piece in the specified direction and continue with the rest of the pieces.
+push_pieces(Board, [], _, Board).
 push_pieces(Board, [Piece|Rest], Direction, NewBoard) :-
     position(Piece, Pos),
     new_pos(Pos, Direction, NewPos), 
@@ -60,7 +57,7 @@ get_push_pieces(List, Direction, Pieces):-
     find_reverse_elem(List, [x-x], Len), sublist(List, Pieces, _, Len, 0)).
 
   
-  print_list([]). 
+print_list([]). 
 print_list([H|T]) :-
     write(H), 
     write(' '), 
