@@ -3,7 +3,7 @@
 % -----------------------------------------
 
 % position(?Piece, ?Position)
-% Find the position of a piece, or the piece in a give position
+% Finds the position of a piece, or the piece in a give position
 :- dynamic position/2.
 
 % create_list(+Size, +Elem, -[Elem|Rest])

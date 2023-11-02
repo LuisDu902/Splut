@@ -142,4 +142,5 @@ game_cycle(GameState) :-
 
 play :- 
     menu(GameState), !,
-    game_cycle(GameState), !.
+    game_cycle(GameState),
+    clear_data.

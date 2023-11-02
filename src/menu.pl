@@ -1,4 +1,13 @@
+% -----------------------------------------
+% |           Menu predicates            |
+% -----------------------------------------
+
+% player_name(+Player, -Name)
+% Finds the name of a player
 :- dynamic player_name/2.
+
+% computer_level(+Computer, -Level)
+% Finds the level of the computer
 :- dynamic computer_level/2.
 
 % -----------------------------------------
@@ -75,7 +84,7 @@ choose_level(Computer) :-
 % choose_board_size(-Size)
 % Prompts the user to choose the size of the game board and reads the selected size.
 choose_board_size(Size):-
-    write('\nChoose the board size (odd number greater than 7): ').
+    write('\nChoose the board size (odd number greater than 7): '),
     select_board(Size).
 
 % -----------------------------------------
