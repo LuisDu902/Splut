@@ -40,8 +40,7 @@ push(Board, X-Y, Direction, NewBoard):-
    nth1(Y, Board, List), write('getting remaing list\n'), get_remaining(X, List, Size, Rest, Direction)),
    write('Getting list : '),
    print_list(Rest),
-   delete(Rest, x-x, Temp),
-   delete(Temp, e-e, Pieces),
+   get_push_pieces(Rest, Direction, Pieces),
    write('Getting updated list : '),
    print_list(Pieces),
    push_pieces(Board, Pieces, Direction, NewBoard).
@@ -54,8 +53,12 @@ push_pieces(Board, [Piece|Rest], Direction, NewBoard) :-
     put_piece(Board, Piece, NewPos, TempBoard),
     push_pieces(TempBoard, Rest, Direction, NewBoard).
 
+get_push_pieces(List, Direction, Pieces):-
+    ((Direction =:= 2; Direction =:= 4) -> find_elem(List, [x-x], Len), sublist(List, Pieces, 0, Len);
+    find_reverse_elem(List, [x-x], Len), sublist(List, Pieces, _, Len, 0)).
 
-print_list([]). 
+  
+  print_list([]). 
 print_list([H|T]) :-
     write(H), 
     write(' '), 
