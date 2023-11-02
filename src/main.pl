@@ -7,33 +7,12 @@
 :- consult(board).
 :- consult(troll).
 :- consult(dwarf).
-
+:- consult(random_bot).
 
 % -----------------------------------------
 
 display_game([Board, _, _, _]) :-
     display_board(Board).
-
-% -----------------------------------------
-
-choose_random_move(Board, Player, 1, Move) :-
-    length(Board, Size),
-    repeat,
-    choose_random_piece(Piece),
-    position(Piece-Player, X-Y),
-    choose_random_direction(D),
-    (valid_move(Piece-Player, X-Y, Size, D) -> format('I chose to move ~a-~a from (~d,~d) -> ~d\n', [Piece, Player, X, Y, D]) ; fail).
-
-% -----------------------------------------
-
-choose_random_piece(Piece) :-
-    List = [t, d, s], 
-    random_member(Piece, List).
-
-% -----------------------------------------
-
-choose_random_direction(D) :-
-    random(1, 4, D).
 
 % -----------------------------------------
 
@@ -78,7 +57,6 @@ choose_move([Board,Player,_,_], Move):-
 
 % -----------------------------------------
 
-
 general_valid_move(NewPos) :-
     \+ position(_-_, NewPos).
 
@@ -91,7 +69,6 @@ valid_move(Board, Piece-Player, Pos, Size, Direction) :-
         Piece == d -> valid_dwarf_move(Board, Pos, Direction)
     ).
 
-
 % -----------------------------------------
 
 general_move(Board, Piece, Pos, NewPos, NewBoard):-
@@ -101,11 +78,29 @@ general_move(Board, Piece, Pos, NewPos, NewBoard):-
 % -----------------------------------------
 
 move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
+    \+computer_level(Player, _),    
     position(Piece-Player, X-Y),
     new_pos(X-Y, Direction, NewX-NewY),
     
     (
         Piece == t -> troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
+        Piece == s -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard) ;
+        Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
+    ),
+
+    (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 
+    Turns = 2, Moves = 2, NrTurns is 3, next_player(Player, NewPlayer), NrMoves is 1;   
+    Moves < 3, NrMoves is Moves + 1, NewPlayer = Player, NrTurns is Turns;   
+    NrTurns is Turns + 1, next_player(Player, NewPlayer), NrMoves is 1).
+
+move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
+    computer_level(Player, Level),    
+    write('Computer moving...\n'),
+    position(Piece-Player, X-Y),
+    new_pos(X-Y, Direction, NewX-NewY),
+    
+    (
+        Piece == t -> random_troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
         Piece == s -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard) ;
         Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
     ),
