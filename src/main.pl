@@ -2,11 +2,12 @@
 :- use_module(library(between)).
 :- use_module(library(random)).
 
-:- consult(menu).
 :- consult(utils).
+:- consult(menu).
 :- consult(board).
 :- consult(troll).
 :- consult(dwarf).
+:- consult(sorcerer).
 :- consult(random_bot).
 
 % display_turn(+Player, +NrMoves)
@@ -110,10 +111,9 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMov
     \+computer_level(Player, _),    
     position(Piece-Player, X-Y),
     new_pos(X-Y, Direction, NewX-NewY),
-    
     (
         Piece == t -> troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
-        Piece == s -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard) ;
+        Piece == s -> sorcerer_move(Board, Moves, Turns, Piece-Player, X-Y, Direction, NewBoard) ;
         Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
     ),
 
