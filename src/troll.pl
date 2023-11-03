@@ -3,7 +3,7 @@
 % ----------------------------------------
 
 % valid_troll_move(+Pos, +Direction)
-% Checks if a troll's move to a new position in the specified direction is valid.
+% Checks if a troll move to a new position in the specified direction is valid.
 valid_troll_move(Pos, Direction):-
     new_pos(Pos, Direction, NewPos),
     ((position(r-_, NewPos); \+ position(_-_, NewPos)) -> true ; false).
@@ -82,22 +82,22 @@ throw_rock(Board, Turn, Pos, Troll, Dir, ThrowDir, NewBoard) :-
 % ----------------------------------------
 
 
-% troll_move(+Board, +Moves, +Turn, +Troll, +Pos, +Direction, -NewBoard, -NewMoves)
 % Handles the movement of the stonetroll piece.
-troll_move(Board, Moves, Turn, Troll, Pos, Direction, NewBoard, NewMoves) :-
+troll_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, NewMove, Turn]) :-
+    position(t-Player, Pos),    
     new_pos(Pos, Direction, NewPos),
     (position(r-_, NewPos) ->
-        throw_rock_option(Board, Troll, NewPos, ThrowDir),
-        throw_rock(Board, Turn, Pos, Troll, Direction, ThrowDir, NewBoard),
-        NewMoves is 3
+        throw_rock_option(Board, t-Player, NewPos, ThrowDir),
+        throw_rock(Board, Turn, Pos, t-Player, Direction, ThrowDir, NewBoard),
+        NewMove is 3
     ;
     (opposite_direction(Direction, NewD), new_pos(Pos, NewD, A-B), position(r-_, A-B) ->
         pull_rock_option(Option),
         (Option == 1 ->
-            pull_rock(Board, Turn, Pos, Troll, Direction, NewBoard), NewMoves is Moves ;
-            general_move(Board, Troll, Pos, NewPos, NewBoard), NewMoves is Moves
+            pull_rock(Board, Turn, Pos, t-Player, Direction, NewBoard), NewMove is Move ;
+            general_move(Board, t-Player, Pos, NewPos, NewBoard), NewMove is Move
         );
-        general_move(Board, Troll, Pos, NewPos, NewBoard), NewMoves is Moves
+        general_move(Board, t-Player, Pos, NewPos, NewBoard), NewMove is Move
     )).
 
 % ----------------------------------------

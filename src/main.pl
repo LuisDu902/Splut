@@ -11,7 +11,7 @@
 :- consult(random_bot).
 
 % display_turn(+Player, +NewMoves)
-% Displays a message indicating the player's turn and the number of moves made.
+% Displays a message indicating the players turn and the number of moves made.
 display_turn(Player, NewMoves):-
     player_name(Player, Name),
     format('\nYour turn to play, ~a! This is your move nr ~d \n\n', [Name, NewMoves]). 
@@ -105,17 +105,16 @@ general_move(Board, Piece, Pos, NewPos, NewBoard):-
 
 % -----------------------------------------
 
-% move(+GameState, +Piece-Direction, -NewGameState)
+% move(+GameState, +Move, -NewGameState)
 % Performs a player move for the specified piece in the given direction and updates the game state.
-move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, Player, NewMoves, Turns]) :-   
-    \+computer_level(Player, _),    
-    position(Piece-Player, X-Y),
-    new_pos(X-Y, Direction, NewX-NewY),
-    (
-        Piece == t -> troll_move(Board, Moves, Turns, Piece-Player, X-Y, Direction, NewBoard, NewMoves);
-        Piece == s -> sorcerer_move(Board, Moves, Turns, Piece-Player, X-Y, Direction, NewBoard), NewMoves is Moves;
-        Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard), NewMoves is Moves
+move(GameState, Piece-Direction, NewGameState) :-   
+    \+computer_level(_, _),  
+      (
+        Piece == t -> troll_move(GameState, Direction, NewGameState);
+        Piece == s -> sorcerer_move(GameState, Direction, NewGameState);
+        Piece == d -> dwarf_move(GameState, Direction, NewGameState)
     ).
+    
 
 next_turn([Board, Player, Moves, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
     (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is Moves; 

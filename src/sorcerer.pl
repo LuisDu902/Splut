@@ -8,21 +8,22 @@
 % chosen_rock(Rock, Turn, Move)
 :- dynamic chosen_rock/3.
 
-sorcerer_move(Board, Move, Turn, Sorcerer, Pos, Direction, NewBoard) :-
+sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]):-
+    position(s-Player, Pos),    
     new_pos(Pos, Direction, NewPos),
     movable_rocks(Turn, Move, Board, Direction, Rocks),
     length(Rocks, Size),
     format('Movable rocks : ~d\n', [Size]),
        
-    ( Size = 0 -> general_move(Board, Sorcerer, Pos, NewPos, NewBoard);   
+    ( Size = 0 -> general_move(Board, s-Player, Pos, NewPos, NewBoard);   
     
     Size = 1 -> levitate_option(Option),
     ( Option = 1 ->
         (chosen_rock(_, Turn, Move) ->
-            continuous_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, NewBoard);
-            first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, NewBoard)
+            continuous_levitation(Board, Move, Turn, s-Player, Pos, NewPos, Direction, NewBoard);
+            first_levitation(Board, Move, Turn, s-Player, Pos, NewPos, Direction, Rocks, NewBoard)
         );   
-        general_move(Board, Sorcerer, Pos, NewPos, NewBoard)
+        general_move(Board, s-Player, Pos, NewPos, NewBoard)
     );   
     
     levitate_option(Option),
@@ -39,8 +40,7 @@ continuous_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, NewBo
     general_move(Board, Rock, RockPos, NewRockPos, Temp),
     general_move(Temp, Sorcerer, Pos, NewPos, NewBoard), 
     N is Move + 1,
-    asserta(chosen_rock(Rock, Turn, N)), 
-    asserta(moved_rocks(Rock, Turn)).
+    asserta(chosen_rock(Rock, Turn, N)).
             
 
 first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, NewBoard):-
@@ -48,10 +48,11 @@ first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, New
     position(r-I, RockPos),
     new_pos(RockPos, Direction, NewRockPos),
     general_move(Board, r-I, RockPos, NewRockPos, Temp),
+    format('New rock- ~d pos: ~d\n', [I, NewRockPos]),
     general_move(Temp, Sorcerer, Pos, NewPos, NewBoard),  
     N is Move + 1,
     asserta(chosen_rock(r-I, Turn, N)), 
-    asserta(moved_rocks(Rock, Turn)).
+    asserta(moved_rocks(r-I, Turn)).
 
 levitate_option(Option):-
     write('\nDo you want to levitate a rock?\n\n'),
@@ -94,7 +95,7 @@ movable_rocks(Turn, Move, Board, Direction, Rocks) :-
  
     
 
-choose_rock_option(Rocks, Rock):-
+choose_rock_option(Rocks, Option):-
     write('\nWhich rock do you want to levitate?\n\n'),
     print_rocks(Rocks),
     write('\nRock : '),
