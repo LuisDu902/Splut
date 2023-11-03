@@ -20,22 +20,25 @@ can_push(Board, X-Y, Direction) :-
 
 % -----------------------------------------
 
-% dwarf_move(+Board, +Dwarf, +Pos, +Direction, -NewBoard)
+
+
+
 % Moves the dwarf taking into consideration the fact that he has to push the other pieces with him
-dwarf_move(Board, Dwarf, Pos, Direction, NewBoard) :-
+dwarf_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]) :-
+    position(d-Player, Pos),
     new_pos(Pos, Direction, NewPos),
     write('dwarf moving\n'),
     (position(_-_, NewPos) -> 
         write('pushing pieces\n'),
-        push(Board, Pos, Direction, Temp),
-        general_move(Temp, Dwarf, Pos, NewPos, NewBoard)
-    ; general_move(Board, Dwarf, Pos, NewPos, NewBoard)).
+        push(Board, Turn, Pos, Direction, Temp),
+        general_move(Temp, d-Player, Pos, NewPos, NewBoard)
+    ; general_move(Board, d-Player, Pos, NewPos, NewBoard)).
 
 % -----------------------------------------
 
 % push(+Board, +X-Y, +Direction, -NewBoard)
 % Pushes all pieces next to the dwarf in the direction of the movement one space
-push(Board, X-Y, Direction, NewBoard):-
+push(Board, Turn, X-Y, Direction, NewBoard):-
    length(Board, Size),
    ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
    nth1(Y, Board, List), write('getting remaing list\n'), get_remaining(X, List, Size, Rest, Direction)),
@@ -44,14 +47,15 @@ push(Board, X-Y, Direction, NewBoard):-
    get_push_pieces(Rest, Direction, Pieces),
    write('Getting updated list : '),
    print_list(Pieces),
-   push_pieces(Board, Pieces, Direction, NewBoard).
+   push_pieces(Board, Turn, Pieces, Direction, NewBoard).
 
 % -----------------------------------------
 
 % push_pieces(+Board, +[Piece|Rest], +Direction, -NewBoard)
 % Push the first piece in the specified direction and continue with the rest of the pieces.
-push_pieces(Board, [], _, Board).
-push_pieces(Board, [Piece|Rest], Direction, NewBoard) :-
+push_pieces(Board, _, [], _, Board).
+push_pieces(Board, Turn, [Piece|Rest], Direction, NewBoard) :-
+    (Piece = r-_, asserta(moved_rocks(Piece, Turn)); true),
     position(Piece, Pos),
     new_pos(Pos, Direction, NewPos), 
     update_piece_pos(Piece, NewPos),
