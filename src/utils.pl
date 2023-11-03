@@ -158,4 +158,6 @@ get_remaining(N, List, Size, Rest, Direction):-
 clear_data:-
     retractall(position(_,_)),
     retractall(player_name(_,_)),
-    retractall(computer_level(_,_)).
+    retractall(computer_level(_,_)),
+    retractall(moved_rocks(_,_)),
+    retractall(chosen_rock(_,_,_)).

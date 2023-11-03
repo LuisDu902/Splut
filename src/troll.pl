@@ -34,13 +34,14 @@ pull_rock_option(Option):-
 
 % pull_rock(+Board, +Position, +Troll, +Direction, -NewBoard)
 % Handles the process of pulling a rock in a specified direction.
-pull_rock(Board, Position, Troll, Direction, NewBoard) :-
+pull_rock(Board, Turn, Position, Troll, Direction, NewBoard) :-
     opposite_direction(Direction, NewD), new_pos(Position, NewD, A-B), position(Rock, A-B),
     new_pos(Position, Direction, NewPos),
     update_piece_pos(Troll, NewPos),
     update_piece_pos(Rock, Position),
     swap_places(Board, Troll, Position, x-x, NewPos, Temp),
-    swap_places(Temp, Rock, A-B, x-x, Position, NewBoard).
+    swap_places(Temp, Rock, A-B, x-x, Position, NewBoard),
+    asserta(moved_rocks(Rock, Turn)).
 
 % ----------------------------------------
 
@@ -68,31 +69,32 @@ throw_rock_option(Board, _-Player, Position, Direction):-
 
 % ----------------------------------------
 
-% throw_rock(+Board, +Pos, +Troll, +Dir, +ThrowDir, -NewBoard)
+% throw_rock(+Board, +Turn, +Pos, +Troll, +Dir, +ThrowDir, -NewBoard)
 % Handles the process of throwing a rock in the specified direction.
-throw_rock(Board, Pos, Troll, Dir, ThrowDir, NewBoard) :-
+throw_rock(Board, Turn, Pos, Troll, Dir, ThrowDir, NewBoard) :-
     new_pos(Pos, Dir, NewPos),
     position(Rock, NewPos),
     update_piece_pos(Troll, NewPos),
     swap_places(Board, Troll, Pos, x-x, NewPos, Tmp),
-    move_rock(Tmp, Rock, ThrowDir, NewBoard).
+    move_rock(Tmp, Rock, ThrowDir, NewBoard),
+    asserta(moved_rocks(Rock, Turn)).
 
 % ----------------------------------------
 
 
-% troll_move(+Board, +Moves, +Troll, +Pos, +Direction, -NewBoard, -NewMoves)
+% troll_move(+Board, +Moves, +Turn, +Troll, +Pos, +Direction, -NewBoard, -NewMoves)
 % Handles the movement of the stonetroll piece.
-troll_move(Board, Moves, Troll, Pos, Direction, NewBoard, NewMoves) :-
+troll_move(Board, Moves, Turn, Troll, Pos, Direction, NewBoard, NewMoves) :-
     new_pos(Pos, Direction, NewPos),
     (position(r-_, NewPos) ->
         throw_rock_option(Board, Troll, NewPos, ThrowDir),
-        throw_rock(Board, Pos, Troll, Direction, ThrowDir, NewBoard),
+        throw_rock(Board, Turn, Pos, Troll, Direction, ThrowDir, NewBoard),
         NewMoves is 3
     ;
     (opposite_direction(Direction, NewD), new_pos(Pos, NewD, A-B), position(r-_, A-B) ->
         pull_rock_option(Option),
         (Option == 1 ->
-            pull_rock(Board, Pos, Troll, Direction, NewBoard), NewMoves is Moves ;
+            pull_rock(Board, Turn, Pos, Troll, Direction, NewBoard), NewMoves is Moves ;
             general_move(Board, Troll, Pos, NewPos, NewBoard), NewMoves is Moves
         );
         general_move(Board, Troll, Pos, NewPos, NewBoard), NewMoves is Moves

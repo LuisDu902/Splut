@@ -112,7 +112,7 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, Player, NewMoves
     position(Piece-Player, X-Y),
     new_pos(X-Y, Direction, NewX-NewY),
     (
-        Piece == t -> troll_move(Board, Moves, Piece-Player, X-Y, Direction, NewBoard, NewMoves);
+        Piece == t -> troll_move(Board, Moves, Turns, Piece-Player, X-Y, Direction, NewBoard, NewMoves);
         Piece == s -> sorcerer_move(Board, Moves, Turns, Piece-Player, X-Y, Direction, NewBoard), NewMoves is Moves;
         Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard), NewMoves is Moves
     ).

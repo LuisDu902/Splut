@@ -2,6 +2,9 @@
 % |         Sorcerer predicates          |
 % ----------------------------------------
 
+% moved_rocks(Rock, Turn)
+:- dynamic moved_rocks/2.
+
 % chosen_rock(Rock, Turn, Move)
 :- dynamic chosen_rock/3.
 
@@ -36,7 +39,8 @@ continuous_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, NewBo
     general_move(Board, Rock, RockPos, NewRockPos, Temp),
     general_move(Temp, Sorcerer, Pos, NewPos, NewBoard), 
     N is Move + 1,
-    asserta(chosen_rock(Rock, Turn, N)).
+    asserta(chosen_rock(Rock, Turn, N)), 
+    asserta(moved_rocks(Rock, Turn)).
             
 
 first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, NewBoard):-
@@ -46,7 +50,8 @@ first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, New
     general_move(Board, r-I, RockPos, NewRockPos, Temp),
     general_move(Temp, Sorcerer, Pos, NewPos, NewBoard),  
     N is Move + 1,
-    asserta(chosen_rock(r-I, Turn, N)).
+    asserta(chosen_rock(r-I, Turn, N)), 
+    asserta(moved_rocks(Rock, Turn)).
 
 levitate_option(Option):-
     write('\nDo you want to levitate a rock?\n\n'),
@@ -79,7 +84,12 @@ movable_rocks(Turn, Move, Board, Direction, Rocks) :-
             new_pos(Pos, Direction, NewPos),
             inside_board(NewPos, Size),
             \+ position(_, NewPos)),
-            Rocks)
+            List1),
+    last_turn_rocks(Turn, List2),
+    write('\n\nLAST TURN MOVED ROCKS: '),
+    print_list(List2),
+    nl,
+     subtract_lists(List1, List2, Rocks)
     ).
  
     
@@ -98,3 +108,22 @@ print_rocks([r-I|Rest]) :-
     position(r-I, X-Y),
     format('[~d] Rock at position (~d, ~d)\n', [I, X, Y]),
     print_rocks(Rest).
+
+
+last_turn_rocks(Turn, Rocks):-
+    LastTurn is Turn-1,
+    findall(Rock, moved_rocks(Rock, LastTurn), Rocks).
+
+
+% Base case: If the first list is empty, the difference is also empty
+subtract_lists([], _, []).
+
+% If the element X is in the second list, skip it and continue checking the rest of the first list
+subtract_lists([X|Tail1], List2, Difference) :-
+    member(X, List2),
+    subtract_lists(Tail1, List2, Difference).
+
+% If the element X is not in the second list, include it in the difference and continue checking the rest of the first list
+subtract_lists([X|Tail1], List2, [X|Difference]) :-
+    \+ member(X, List2),
+    subtract_lists(Tail1, List2, Difference).
