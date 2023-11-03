@@ -95,6 +95,15 @@ new_pos(X-Y, 4, NewX-Y) :- NewX is X + 1.
 
 % -----------------------------------------
 
+% distance(+X1-Y1, +X2-Y2, -Dist)
+% Calculates the distance between two positions
+distance(Piece1, Piece2, Dist) :-
+    position(Piece1, X1-Y1),
+    position(Piece2, X2-Y2),
+    Dist is (abs(X2-X1) + abs(Y2-Y1)).
+
+% -----------------------------------------
+
 % next_player(+CurrentPlayer, -NextPlayer)
 % Determines the next player in the game based on the current player.
 next_player(p1, p2).

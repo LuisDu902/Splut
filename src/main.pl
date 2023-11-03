@@ -8,6 +8,8 @@
 :- consult(troll).
 :- consult(dwarf).
 :- consult(random_bot).
+:- consult(greedy_bot).
+
 
 % display_turn(+Player, +NrMoves)
 % Displays a message indicating the player's turn and the number of moves made.
@@ -135,7 +137,7 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMov
     (
         Piece == t -> random_troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
         Piece == s -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard) ;
-        Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
+        Piece == d -> general_move(Board, Piece-Player, X-Y, Direction, NewBoard)
     ),
 
     (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 
