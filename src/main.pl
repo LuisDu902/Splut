@@ -107,14 +107,30 @@ general_move(Board, Piece, Pos, NewPos, NewBoard):-
 
 % move(+GameState, +Move, -NewGameState)
 % Performs a player move for the specified piece in the given direction and updates the game state.
-move(GameState, Piece-Direction, NewGameState) :-   
-    \+computer_level(_, _),  
+move([Board, Player, Move, Turn], Piece-Direction, NewGameState) :-   
+    \+computer_level(Player, _),  
       (
-        Piece == t -> troll_move(GameState, Direction, NewGameState);
-        Piece == s -> sorcerer_move(GameState, Direction, NewGameState);
-        Piece == d -> dwarf_move(GameState, Direction, NewGameState)
-    ).
+        Piece == t -> troll_move([Board, Player, Move, Turn], Direction, NewGameState);
+        Piece == s -> sorcerer_move([Board, Player, Move, Turn], Direction, NewGameState);
+        Piece == d -> dwarf_move([Board, Player, Move, Turn], Direction, NewGameState)
+    ), !.
     
+
+
+% -----------------------------------------
+
+% move(+GameState, +Piece-Direction, -NewGameState)
+% Performs a computer move for the specified piece in the given direction and updates the game state.
+move([Board, Player, Move, Turn], Piece-Direction, NewGameState) :-   
+    computer_level(Player, 1),    
+    write('Computer moving...\n'),
+    (
+        Piece == t -> random_troll_move([Board, Player, Move, Turn], Direction, NewGameState) ;
+        Piece == s -> random_sorcerer_move([Board, Player, Move, Turn], Direction, NewGameState) ;
+        Piece == d -> dwarf_move([Board, Player, Move, Turn], Direction, NewGameState)
+    ), !.
+
+% -----------------------------------------
 
 next_turn([Board, Player, Moves, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
     (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is Moves; 
@@ -122,28 +138,6 @@ next_turn([Board, Player, Moves, Turns], [Board, NewPlayer, NewMoves, NewTurns])
     Moves < 3, NewMoves is Moves + 1, NewPlayer = Player, NewTurns is Turns;   
     NewTurns is Turns + 1, next_player(Player, NewPlayer), NewMoves is 1).
 
-% -----------------------------------------
-
-% move(+GameState, +Piece-Direction, -NewGameState)
-% Performs a computer move for the specified piece in the given direction and updates the game state.
-move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NewMoves, NewTurns]) :-   
-    computer_level(Player, 1),    
-    write('Computer moving...\n'),
-    position(Piece-Player, X-Y),
-    new_pos(X-Y, Direction, NewX-NewY),
-    
-    (
-        Piece == t -> random_troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
-        Piece == s -> general_move(Board, Piece-Player, X-Y, NewX-NewY, NewBoard) ;
-        Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
-    ),
-
-    (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is Moves; 
-    Turns = 2, Moves = 2, NewTurns is 3, next_player(Player, NewPlayer), NewMoves is 1;   
-    Moves < 3, NewMoves is Moves + 1, NewPlayer = Player, NewTurns is Turns;   
-    NewTurns is Turns + 1, next_player(Player, NewPlayer), NewMoves is 1).
-
-% -----------------------------------------
 
 % game_over(-Winner)
 % Checks if the game is over and determines the winner.

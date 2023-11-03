@@ -28,8 +28,8 @@ sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, T
     
     levitate_option(Option),
     ( Option = 1 ->
-        first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, NewBoard);   
-        general_move(Board, Sorcerer, Pos, NewPos, NewBoard)
+        first_levitation(Board, Move, Turn, s-Player, Pos, NewPos, Direction, Rocks, NewBoard);   
+        general_move(Board, s-Player, Pos, NewPos, NewBoard)
     )).
 
   
