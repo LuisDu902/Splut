@@ -17,7 +17,7 @@ valid_throw_direction(Board, Player, Position, Direction) :-
 % ----------------------------------------
 
 pull_rock_option(Option):-
-    write('Do you want to pull the rock right behind the Stonetroll?\n\n'),
+    write('\nDo you want to pull the rock right behind the Stonetroll?\n\n'),
     write('[1] Yes\n'),
     write('[2] No\n\n'),
     select_option(1, 2, Option).   
