@@ -2,17 +2,23 @@
 % |     Computer Level 1 predicates       |
 % -----------------------------------------
 
+% choose_random_piece(-Piece)
+% Randomly selects a piece from the list of game pieces [t, d, s] and unifies it with the variable Piece.
 choose_random_piece(Piece) :-
     List = [t, d, s], 
     random_member(Piece, List).
 
 % -----------------------------------------
 
+% choose_random_direction(-D)
+% Randomly selects a direction (1 to 4) and unifies it with the variable D.
 choose_random_direction(D) :-
     random(1, 4, D).
 
 % -----------------------------------------
 
+% choose_random_move(+Board, +Player, +Level, -Piece-D)
+% Chooses a random valid move from the available options on the game board.
 choose_random_move(Board, Player, 1, Piece-D) :-
     length(Board, Size),
     repeat,
@@ -23,6 +29,8 @@ choose_random_move(Board, Player, 1, Piece-D) :-
 
 % -----------------------------------------
 
+% random_troll_move(+Board, +Troll, +Pos, +Direction, -NewBoard)
+% Determines a random move for the troll on the game board and updates the board accordingly.
 random_troll_move(Board, Troll, Pos, Direction, NewBoard) :-
     new_pos(Pos, Direction, NewPos),
     (position(r-_, NewPos) ->
@@ -41,6 +49,8 @@ random_troll_move(Board, Troll, Pos, Direction, NewBoard) :-
 
 % -----------------------------------------
 
+% random_throw_rock(+Board, +Player, +Position, -Direction)
+% Randomly selects a direction to throw a rock from the specified position on the game board.
 random_throw_rock(Board, _-Player, Position, Direction):-
     repeat,
     choose_random_direction(Direction),
