@@ -2,10 +2,16 @@
 % |         Stonetoll predicates         |
 % ----------------------------------------
 
+% valid_troll_move(+Pos, +Direction)
+% Checks if a troll's move to a new position in the specified direction is valid.
 valid_troll_move(Pos, Direction):-
     new_pos(Pos, Direction, NewPos),
     ((position(r-_, NewPos); \+ position(_-_, NewPos)) -> true ; false).
 
+% ----------------------------------------
+
+% valid_throw_direction(+Board, +Player, +Position, +Direction)
+% Checks if a throw direction from a specified position is valid.
 valid_throw_direction(Board, Player, Position, Direction) :-
     length(Board, Size),
     new_pos(Position, Direction, NewPos),
@@ -16,12 +22,18 @@ valid_throw_direction(Board, Player, Position, Direction) :-
 
 % ----------------------------------------
 
+% pull_rock_option(-Option)
+% Displays the pull rock option to the player and reads the player choice.
 pull_rock_option(Option):-
-    write('Do you want to pull the rock right behind the Stonetroll?\n\n'),
+    write('\nDo you want to pull the rock right behind the Stonetroll?\n\n'),
     write('[1] Yes\n'),
     write('[2] No\n\n'),
     select_option(1, 2, Option).   
 
+% ----------------------------------------
+
+% pull_rock(+Board, +Position, +Troll, +Direction, -NewBoard)
+% Handles the process of pulling a rock in a specified direction.
 pull_rock(Board, Position, Troll, Direction, NewBoard) :-
     opposite_direction(Direction, NewD), new_pos(Position, NewD, A-B), position(Rock, A-B),
     new_pos(Position, Direction, NewPos),
@@ -32,6 +44,8 @@ pull_rock(Board, Position, Troll, Direction, NewBoard) :-
 
 % ----------------------------------------
 
+% throw_rock_menu(-Direction)
+% Displays the throw rock menu to the player and reads the player chosen direction.
 throw_rock_menu(Direction):-
     write('\nYou have found a rock! Which direction do you want to throw it?\n\n'),
     write('[1] Up\n'),
@@ -40,6 +54,10 @@ throw_rock_menu(Direction):-
     write('[4] Right\n\n'),
     select_option(1, 4, Direction).
 
+% ----------------------------------------
+
+% throw_rock_option(+Board, +Player, +Position, -Direction)
+% Handles the process of allowing the player to choose the direction to throw a rock.
 throw_rock_option(Board, _-Player, Position, Direction):-
     repeat,
     throw_rock_menu(Direction),
@@ -48,6 +66,10 @@ throw_rock_option(Board, _-Player, Position, Direction):-
         fail
     ).
 
+% ----------------------------------------
+
+% throw_rock(+Board, +Pos, +Troll, +Dir, +ThrowDir, -NewBoard)
+% Handles the process of throwing a rock in the specified direction.
 throw_rock(Board, Pos, Troll, Dir, ThrowDir, NewBoard) :-
     new_pos(Pos, Dir, NewPos),
     position(Rock, NewPos),
@@ -57,6 +79,8 @@ throw_rock(Board, Pos, Troll, Dir, ThrowDir, NewBoard) :-
 
 % ----------------------------------------
 
+% troll_move(+Board, +Troll, +Pos, +Direction, -NewBoard)
+% Handles the movement of the stonetroll piece.
 troll_move(Board, Troll, Pos, Direction, NewBoard) :-
     new_pos(Pos, Direction, NewPos),
     (position(r-_, NewPos) ->
@@ -74,6 +98,8 @@ troll_move(Board, Troll, Pos, Direction, NewBoard) :-
 
 % ----------------------------------------
 
+% move_rock(+Board, +Rock, +Direction, -NewBoard)
+% Moves a rock piece in the specified direction on the game board.
 move_rock(Board, Rock, Direction, NewBoard):-
     position(Rock, X-Y),
     length(Board, Size),
@@ -84,7 +110,11 @@ move_rock(Board, Rock, Direction, NewBoard):-
     (position(Piece, NewX-NewY) -> retract(position(Piece, NewX-NewY)); true),
     update_piece_pos(Rock, NewX-NewY), !,
     put_piece(Board, Rock, NewX-NewY, NewBoard).
-    
+
+% ----------------------------------------
+
+% new_rock_pos(+List, +Pos, +Direction, -NewPos)
+% Calculates the new position for a rock based on the specified direction and obstacles in its path.
 new_rock_pos([], Pos, _, Pos).
 
 % move up
@@ -110,13 +140,3 @@ new_rock_pos(List, X-Y, 4, NewX-Y):-
     find_elem(List, [r-_, t-_, e-e], A),
     TmpX is X + A + 1,
     (position(s-_, TmpX-Y) -> NewX is TmpX; NewX is X + A).
-
-get_remaining(N, List, Size, Rest, Direction):-
-    (   (Direction =:= 2; Direction =:= 4) ->
-        Len is Size - N,
-        format('It is starting in ~d with length ~d\n', [N, Len]),
-        sublist(List, Rest, N, Len, _)
-    ;   Len is N - 1,
-        format('It is starting at 0 with length ~d\n', [Len]),
-        sublist(List, Rest, 0, Len, _)
-    ).
