@@ -10,18 +10,18 @@
 :- consult(sorcerer).
 :- consult(random_bot).
 
-% display_turn(+Player, +NrMoves)
+% display_turn(+Player, +NewMoves)
 % Displays a message indicating the player's turn and the number of moves made.
-display_turn(Player, NrMoves):-
+display_turn(Player, NewMoves):-
     player_name(Player, Name),
-    format('\nYour turn to play, ~a! This is your move nr ~d \n\n', [Name, NrMoves]). 
+    format('\nYour turn to play, ~a! This is your move nr ~d \n\n', [Name, NewMoves]). 
 
 % -----------------------------------------
 
 % display_game(+GameState)
 % Displays the current state of the game, including the player turn and the game board.
-display_game([Board, Player, NrMoves, _]) :-
-    display_turn(Player, NrMoves),
+display_game([Board, Player, NewMoves, _]) :-
+    display_turn(Player, NewMoves),
     display_board(Board).
 
 % -----------------------------------------
@@ -107,26 +107,27 @@ general_move(Board, Piece, Pos, NewPos, NewBoard):-
 
 % move(+GameState, +Piece-Direction, -NewGameState)
 % Performs a player move for the specified piece in the given direction and updates the game state.
-move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
+move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, Player, NewMoves, Turns]) :-   
     \+computer_level(Player, _),    
     position(Piece-Player, X-Y),
     new_pos(X-Y, Direction, NewX-NewY),
     (
-        Piece == t -> troll_move(Board, Piece-Player, X-Y, Direction, NewBoard) ;
-        Piece == s -> sorcerer_move(Board, Moves, Turns, Piece-Player, X-Y, Direction, NewBoard) ;
-        Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
-    ),
+        Piece == t -> troll_move(Board, Moves, Piece-Player, X-Y, Direction, NewBoard, NewMoves);
+        Piece == s -> sorcerer_move(Board, Moves, Turns, Piece-Player, X-Y, Direction, NewBoard), NewMoves is Moves;
+        Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard), NewMoves is Moves
+    ).
 
-    (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 
-    Turns = 2, Moves = 2, NrTurns is 3, next_player(Player, NewPlayer), NrMoves is 1;   
-    Moves < 3, NrMoves is Moves + 1, NewPlayer = Player, NrTurns is Turns;   
-    NrTurns is Turns + 1, next_player(Player, NewPlayer), NrMoves is 1).
+next_turn([Board, Player, Moves, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
+    (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is Moves; 
+    Turns = 2, Moves = 2, NewTurns is 3, next_player(Player, NewPlayer), NewMoves is 1;   
+    Moves < 3, NewMoves is Moves + 1, NewPlayer = Player, NewTurns is Turns;   
+    NewTurns is Turns + 1, next_player(Player, NewPlayer), NewMoves is 1).
 
 % -----------------------------------------
 
 % move(+GameState, +Piece-Direction, -NewGameState)
 % Performs a computer move for the specified piece in the given direction and updates the game state.
-move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMoves, NrTurns]) :-   
+move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NewMoves, NewTurns]) :-   
     computer_level(Player, 1),    
     write('Computer moving...\n'),
     position(Piece-Player, X-Y),
@@ -138,10 +139,10 @@ move([Board, Player, Moves, Turns], Piece-Direction, [NewBoard, NewPlayer, NrMov
         Piece == d -> dwarf_move(Board, Piece-Player, X-Y, Direction, NewBoard)
     ),
 
-    (Turns = 1, NrTurns is 2, next_player(Player, NewPlayer), NrMoves is Moves; 
-    Turns = 2, Moves = 2, NrTurns is 3, next_player(Player, NewPlayer), NrMoves is 1;   
-    Moves < 3, NrMoves is Moves + 1, NewPlayer = Player, NrTurns is Turns;   
-    NrTurns is Turns + 1, next_player(Player, NewPlayer), NrMoves is 1).
+    (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is Moves; 
+    Turns = 2, Moves = 2, NewTurns is 3, next_player(Player, NewPlayer), NewMoves is 1;   
+    Moves < 3, NewMoves is Moves + 1, NewPlayer = Player, NewTurns is Turns;   
+    NewTurns is Turns + 1, next_player(Player, NewPlayer), NewMoves is 1).
 
 % -----------------------------------------
 
@@ -171,7 +172,8 @@ game_cycle(_) :-
 game_cycle(GameState) :-
     display_game(GameState), !,
     choose_move(GameState, Move),
-    move(GameState, Move, NewGameState),
+    move(GameState, Move, Temp),
+    next_turn(Temp, NewGameState),
     game_cycle(NewGameState).
 
 % -----------------------------------------

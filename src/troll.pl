@@ -79,21 +79,23 @@ throw_rock(Board, Pos, Troll, Dir, ThrowDir, NewBoard) :-
 
 % ----------------------------------------
 
-% troll_move(+Board, +Troll, +Pos, +Direction, -NewBoard)
+
+% troll_move(+Board, +Moves, +Troll, +Pos, +Direction, -NewBoard, -NewMoves)
 % Handles the movement of the stonetroll piece.
-troll_move(Board, Troll, Pos, Direction, NewBoard) :-
+troll_move(Board, Moves, Troll, Pos, Direction, NewBoard, NewMoves) :-
     new_pos(Pos, Direction, NewPos),
     (position(r-_, NewPos) ->
         throw_rock_option(Board, Troll, NewPos, ThrowDir),
-        throw_rock(Board, Pos, Troll, Direction, ThrowDir, NewBoard)
+        throw_rock(Board, Pos, Troll, Direction, ThrowDir, NewBoard),
+        NewMoves is 3
     ;
     (opposite_direction(Direction, NewD), new_pos(Pos, NewD, A-B), position(r-_, A-B) ->
         pull_rock_option(Option),
         (Option == 1 ->
-            pull_rock(Board, Pos, Troll, Direction, NewBoard) ;
-            general_move(Board, Troll, Pos, NewPos, NewBoard)
+            pull_rock(Board, Pos, Troll, Direction, NewBoard), NewMoves is Moves ;
+            general_move(Board, Troll, Pos, NewPos, NewBoard), NewMoves is Moves
         );
-        general_move(Board, Troll, Pos, NewPos, NewBoard)
+        general_move(Board, Troll, Pos, NewPos, NewBoard), NewMoves is Moves
     )).
 
 % ----------------------------------------
