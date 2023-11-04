@@ -24,9 +24,7 @@ can_push(Board, X-Y, Direction) :-
 dwarf_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]) :-
     position(d-Player, Pos),
     new_pos(Pos, Direction, NewPos),
-    write('dwarf moving\n'),
     (position(_-_, NewPos) -> 
-        write('pushing pieces\n'),
         push(Board, Turn, Pos, Direction, Temp),
         general_move(Temp, d-Player, Pos, NewPos, NewBoard)
     ; general_move(Board, d-Player, Pos, NewPos, NewBoard)).
@@ -38,12 +36,8 @@ dwarf_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn
 push(Board, Turn, X-Y, Direction, NewBoard):-
    length(Board, Size),
    ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
-   nth1(Y, Board, List), write('getting remaing list\n'), get_remaining(X, List, Size, Rest, Direction)),
-   write('Getting list : '),
-   print_list(Rest),
+   nth1(Y, Board, List), get_remaining(X, List, Size, Rest, Direction)),
    get_push_pieces(Rest, Direction, Pieces),
-   write('Getting updated list : '),
-   print_list(Pieces),
    push_pieces(Board, Turn, Pieces, Direction, NewBoard).
 
 % -----------------------------------------
@@ -57,7 +51,7 @@ push_pieces(Board, Turn, [Piece|Rest], Direction, NewBoard) :-
     new_pos(Pos, Direction, NewPos), 
     update_piece_pos(Piece, NewPos),
     put_piece(Board, Piece, NewPos, TempBoard),
-    push_pieces(TempBoard, Rest, Direction, NewBoard).
+    push_pieces(TempBoard, Turn, Rest, Direction, NewBoard).
 
 % -----------------------------------------
 
@@ -72,3 +66,4 @@ print_list([H|T]) :-
     write(H), 
     write(' '), 
     print_list(T). 
+

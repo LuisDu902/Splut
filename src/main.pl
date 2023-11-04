@@ -10,19 +10,25 @@
 :- consult(sorcerer).
 :- consult(random_bot).
 
-% display_turn(+Player, +NewMoves)
-% Displays a message indicating the players turn and the number of moves made.
-display_turn(Player, NewMoves):-
+% display_turn(+Player, +Move, +Turn)
+% Displays a message indicating the players turn and the number of moves and turns made.
+display_turn(Player, Move, Turn):-
+    \+computer_level(Player, _),
     player_name(Player, Name),
-    format('\nYour turn to play, ~a! This is your move nr ~d \n\n', [Name, NewMoves]). 
+    format('\n\nYour turn to play, ~a! This is your move ~d of turn ~d \n\n', [Name, Move, Turn]), !. 
+
+display_turn(Player, Move, Turn):-
+    player_name(Player, Name),
+    format('\n~a move ~d of turn ~d: ', [Name, Move, Turn]), !. 
+
 
 % -----------------------------------------
 
 % display_game(+GameState)
 % Displays the current state of the game, including the player turn and the game board.
-display_game([Board, Player, NewMoves, _]) :-
-    display_turn(Player, NewMoves),
-    display_board(Board).
+display_game([Board, Player, Move, Turn]) :-
+    display_turn(Player, Move, Turn),
+    (\+computer_level(Player, _) -> display_board(Board); true).
 
 % -----------------------------------------
 
@@ -63,7 +69,6 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
     repeat,
     choose_piece(Player, Piece),
     position(Piece-Player, X-Y),
-    format('Original position: (~d, ~d)\n', [X, Y]),
     choose_direction(Direction),
    
     (valid_move(Board, Piece-Player, X-Y, Size, Direction) -> true ; 
@@ -131,22 +136,24 @@ move([Board, Player, Move, Turn], Piece-Direction, NewGameState) :-
 
 % move(+GameState, +Piece-Direction, -NewGameState)
 % Performs a computer move for the specified piece in the given direction and updates the game state.
-move([Board, Player, Move, Turn], Piece-Direction, NewGameState) :-   
-    computer_level(Player, 1),    
-    write('Computer moving...\n'),
+move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-   
+    computer_level(Player, 1),
     (
-        Piece == t -> random_troll_move([Board, Player, Move, Turn], Direction, NewGameState) ;
-        Piece == s -> random_sorcerer_move([Board, Player, Move, Turn], Direction, NewGameState) ;
-        Piece == d -> dwarf_move([Board, Player, Move, Turn], Direction, NewGameState)
-    ), !.
+        Piece == t -> random_troll_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
+        Piece == s -> random_sorcerer_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
+        Piece == d -> dwarf_move([Board, Player, NrMove, Turn], Direction, NewGameState),  
+                      position(d-Player, NewX-NewY),
+                      format('I moved my dwarf to (~d, ~d)', [NewX, NewY])   
+    ).
+    
 
 % -----------------------------------------
 
-next_turn([Board, Player, Moves, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
-    (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is Moves; 
-    Turns = 2, Moves = 2, NewTurns is 3, next_player(Player, NewPlayer), NewMoves is 1;   
-    Moves < 3, NewMoves is Moves + 1, NewPlayer = Player, NewTurns is Turns;   
-    NewTurns is Turns + 1, next_player(Player, NewPlayer), NewMoves is 1).
+next_turn([Board, Player, NrMove, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
+    (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is 1, nl; 
+    Turns = 2, NrMove \= 1, NewTurns is 3, next_player(Player, NewPlayer), NewMoves is 1, nl;   
+    NrMove < 3, NewMoves is NrMove + 1, NewPlayer = Player, NewTurns is Turns;   
+    NrMove = 3, NewTurns is Turns + 1, next_player(Player, NewPlayer), NewMoves is 1, nl).
 
 
 % game_over(-Winner)
@@ -174,9 +181,6 @@ game_cycle(_) :-
 
 game_cycle(GameState) :-
     display_game(GameState), !,
-    valid_moves(GameState, ListOfMoves),
-    print_list(ListOfMoves),
-    nl,
     choose_move(GameState, Move),
     move(GameState, Move, Temp),
     next_turn(Temp, NewGameState),
@@ -188,6 +192,7 @@ game_cycle(GameState) :-
 % Initiates and controls the entire gameplay, including setup, game flow, and cleanup.
 play :- 
     menu(GameState), !,
+    clear_console,
     game_cycle(GameState), !, 
     clear_data.
 

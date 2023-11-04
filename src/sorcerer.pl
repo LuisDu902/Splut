@@ -13,7 +13,6 @@ sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, T
     new_pos(Pos, Direction, NewPos),
     movable_rocks(Turn, Move, Board, Direction, Rocks),
     length(Rocks, Size),
-    format('Movable rocks : ~d\n', [Size]),
        
     ( Size = 0 -> general_move(Board, s-Player, Pos, NewPos, NewBoard);   
     
@@ -63,7 +62,6 @@ levitate_option(Option):-
 movable_rocks(Turn, Move, Board, Direction, Rocks) :-
     length(Board, Size),
     (   (chosen_rock(_, Turn, Move)) ->
-        write('THERE IS ALREADY A CHOSEN ROCK\n'),
         chosen_rock(Rock, Turn, Move),
         position(Rock, Pos),
         new_pos(Pos, Direction, NewPos),
@@ -73,12 +71,8 @@ movable_rocks(Turn, Move, Board, Direction, Rocks) :-
         ;   Rocks = []
         )
     ;   (chosen_rock(_, Turn, _)) ->
-        
-        write('NON CONTINUOUS MOVE\n'),
         Rocks = []
     ;   
-    
-        write('FIRST MOVE APPARENTLY\n'),
     findall(Rock,
             (member(Rock, [r-1, r-2, r-3, r-4]),
             position(Rock, Pos),
@@ -87,9 +81,6 @@ movable_rocks(Turn, Move, Board, Direction, Rocks) :-
             \+ position(_, NewPos)),
             List1),
     last_turn_rocks(Turn, List2),
-    write('\n\nLAST TURN MOVED ROCKS: '),
-    print_list(List2),
-    nl,
      subtract_lists(List1, List2, Rocks)
     ).
  

@@ -159,3 +159,7 @@ clear_data:-
     retractall(computer_level(_,_)),
     retractall(moved_rocks(_,_)),
     retractall(chosen_rock(_,_,_)).
+
+
+clear_console:-
+    write('\33\[2J').
