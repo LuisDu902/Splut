@@ -144,10 +144,8 @@ find_reverse_elem(List, Elems, A) :-
 get_remaining(N, List, Size, Rest, Direction):-
     (   (Direction =:= 2; Direction =:= 4) ->
         Len is Size - N,
-        format('It is starting in ~d with length ~d\n', [N, Len]),
         sublist(List, Rest, N, Len, _)
     ;   Len is N - 1,
-        format('It is starting at 0 with length ~d\n', [Len]),
         sublist(List, Rest, 0, Len, _)
     ).
 
@@ -158,4 +156,10 @@ get_remaining(N, List, Size, Rest, Direction):-
 clear_data:-
     retractall(position(_,_)),
     retractall(player_name(_,_)),
-    retractall(computer_level(_,_)).
+    retractall(computer_level(_,_)),
+    retractall(moved_rocks(_,_)),
+    retractall(chosen_rock(_,_,_)).
+
+
+clear_console:-
+    write('\33\[2J').

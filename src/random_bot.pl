@@ -17,43 +17,79 @@ choose_random_direction(D) :-
 
 % -----------------------------------------
 
-% choose_random_move(+Board, +Player, +Level, -Piece-D)
-% Chooses a random valid move from the available options on the game board.
-choose_random_move(Board, Player, 1, Piece-D) :-
-    length(Board, Size),
-    repeat,
-    choose_random_piece(Piece),
-    position(Piece-Player, X-Y),
-    choose_random_direction(D),
-    (valid_move(Board, Piece-Player, X-Y, Size, D) -> format('I chose to move ~a-~a from (~d,~d) -> ~d\n', [Piece, Player, X, Y, D]) ; fail).
-
-% -----------------------------------------
-
-% random_troll_move(+Board, +Troll, +Pos, +Direction, -NewBoard)
 % Determines a random move for the troll on the game board and updates the board accordingly.
-random_troll_move(Board, Troll, Pos, Direction, NewBoard) :-
-    new_pos(Pos, Direction, NewPos),
-    (position(r-_, NewPos) ->
-        random_throw_rock(Board, Troll, NewPos, ThrowDir),
-        format('I am throwing a rock in ~d direction\n', [ThrowDir]),
-        throw_rock(Board, Pos, Troll, Direction, ThrowDir, NewBoard)
+random_troll_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, NewMove, Turn]) :-
+    position(t-Player, X-Y),
+    new_pos(X-Y, Direction, NewX-NewY),
+    (position(r-_, NewX-NewY) ->
+        random_throw_rock(Board, t-Player, NewX-NewY, ThrowDir),
+        throw_rock(Board, Turn, X-Y, t-Player, Direction, ThrowDir, NewBoard),
+        format('I moved my stonetroll to (~d, ~d) and I threw the rock', [NewX, NewY]),
+        NewMove is 3
     ;
-    (opposite_direction(Direction, NewD), new_pos(Pos, NewD, A-B), position(r-_, A-B) ->
+    (opposite_direction(Direction, NewD), new_pos(X-Y, NewD, RockPos), position(r-_, RockPos) ->
         random(1, 2, Option),
         (Option == 1 ->
-            pull_rock(Board, Pos, Troll, Direction, NewBoard) ;
-            general_move(Board, Troll, Pos, NewPos, NewBoard)
+            format('I moved my stonetroll to (~d, ~d) and I pulled the rock', [NewX, NewY]),
+            pull_rock(Board, Turn, X-Y, t-Player, Direction, NewBoard), NewMove is Move ;
+            general_move(Board, t-Player, X-Y, NewX-NewY, NewBoard), NewMove is Move,
+            format('I moved my stonetroll to (~d, ~d)', [NewX, NewY])
         );
-        general_move(Board, Troll, Pos, NewPos, NewBoard)
+        general_move(Board, t-Player, X-Y, NewX-NewY, NewBoard), NewMove is Move,
+        format('I moved my stonetroll to (~d, ~d)', [NewX, NewY])
     )).
+
 
 % -----------------------------------------
 
 % random_throw_rock(+Board, +Player, +Position, -Direction)
 % Randomly selects a direction to throw a rock from the specified position on the game board.
 random_throw_rock(Board, _-Player, Position, Direction):-
-    repeat,
-    choose_random_direction(Direction),
-    (valid_throw_direction(Board, Player, Position, Direction) -> true; fail).
+    Directions = [1,2,3,4],
+    findall(Dir, (member(Dir, Directions), valid_throw_direction(Board, Player, Position, Dir)), ValidDirs),
+    random_member(Direction, ValidDirs).
+
 
 % -----------------------------------------
+
+
+random_sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]):-
+    position(s-Player, Pos),    
+    new_pos(Pos, Direction, NewX-NewY),
+    movable_rocks(Turn, Move, Board, Direction, Rocks),
+    length(Rocks, Size),
+       
+    ( Size = 0 -> 
+        general_move(Board, s-Player, Pos, NewX-NewY, NewBoard), 
+        format('I moved my sorcerer to (~d, ~d)', [NewX, NewY]);   
+    
+    Size = 1 -> random(1, 2, Option),
+    ( Option = 1 ->
+       
+        (chosen_rock(_, Turn, Move) ->
+            continuous_levitation(Board, Move, Turn, s-Player, Pos, NewX-NewY, Direction, NewBoard),
+            format('I moved my sorcerer to (~d, ~d) and I levitated the same rock', [NewX, NewY]);
+            random_first_levitation(Board, Move, Turn, s-Player, Pos, NewX-NewY, Direction, Rocks, NewBoard)
+        );   
+        general_move(Board, s-Player, Pos, NewX-NewY, NewBoard),
+        format('I moved my sorcerer to (~d, ~d)', [NewX, NewY]) 
+    );   
+    
+    random(1, 2, Option),
+    ( Option = 1 ->
+        random_first_levitation(Board, Move, Turn, s-Player, Pos, NewX-NewY, Direction, Rocks, NewBoard);   
+        general_move(Board, s-Player, Pos, NewX-NewY, NewBoard),
+        format('I moved my sorcerer to (~d, ~d)', [NewX, NewY])
+    )).
+
+
+random_first_levitation(Board, Move, Turn, Sorcerer, Pos, NewX-NewY, Direction, Rocks, NewBoard):-
+    random_member(Rock, Rocks),
+    position(Rock, RockX-RockY),
+    new_pos(RockX-RockY, Direction, NewRockPos),
+    general_move(Board, Rock, RockX-RockY, NewRockPos, Temp),
+    general_move(Temp, Sorcerer, Pos, NewX-NewY, NewBoard),  
+    N is Move + 1,
+    asserta(chosen_rock(Rock, Turn, N)), 
+    asserta(moved_rocks(Rock, Turn)),
+    format('I moved my sorcerer to (~d, ~d) and I levitated the rock in (~d,~d)', [NewX, NewY, RockX, RockY]).
