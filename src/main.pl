@@ -9,6 +9,7 @@
 :- consult(dwarf).
 :- consult(sorcerer).
 :- consult(random_bot).
+:- consult(greedy_bot).
 
 % display_turn(+Player, +Move, +Turn)
 % Displays a message indicating the players turn and the number of moves and turns made.
