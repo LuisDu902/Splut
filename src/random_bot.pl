@@ -17,15 +17,6 @@ choose_random_direction(D) :-
 
 % -----------------------------------------
 
-% choose_random_move(+Board, +Player, +Level, -Piece-D)
-% Chooses a random valid move from the available options on the game board.
-choose_random_move(Board, Player, 1, Piece-D) :-
-    length(Board, Size),
-    repeat,
-    choose_random_piece(Piece),
-    position(Piece-Player, X-Y),
-    choose_random_direction(D),
-    (valid_move(Board, Piece-Player, X-Y, Size, D) -> format('I chose to move ~a-~a from (~d,~d) -> ~d\n', [Piece, Player, X, Y, D]) ; fail).
 
 % -----------------------------------------
 

@@ -29,15 +29,17 @@ display_game([Board, Player, NewMoves, _]) :-
 % choose_piece(+Player, -Piece)
 % Allows the player to choose a piece (stonetroll, dwarf, or sorcerer) to move.
 choose_piece(Player, Piece):-
-    repeat,
     write('\nChoose the piece to move: \n'),
     write('[t] Stonetroll\n'),
     write('[d] Dwarf\n'),
     write('[s] Sorcerer\n\n'),
     write('Option: '),
+    repeat,
     get_char(Piece),
     skip_line,
-    (\+position(Piece-Player, _) -> write('\nThis piece is already dead!\n'), fail ; true).
+    (\+memberchk(Piece, [t, d, s]) -> write('\nInvalid input, please choose a valid piece : '), fail;
+    \+position(Piece-Player, _) -> write('\nThis piece is already dead! Choose a valid piece: '), fail ;
+    true).
 
 % -----------------------------------------
 
@@ -73,7 +75,15 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
 % Allows the computer to choose a move based on the current game state.
 choose_move([Board,Player,_,_], Move):-
     computer_level(Player, Level),                 
-    choose_random_move(Board, Player, Level, Move), !.   
+    choose_move(Board, Player, Level, Move), !.   
+
+% -----------------------------------------
+
+% choose_move(+Board, +Player, +Level, -Move)
+% Chooses a random valid move from the available options on the game board.
+choose_move(Board, Player, 1, Move) :-
+    valid_moves([Board, Player, _, _], ListOfMoves),
+    random_member(Move, ListOfMoves).
 
 % -----------------------------------------
 
