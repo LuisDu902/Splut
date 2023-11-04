@@ -164,6 +164,9 @@ game_cycle(_) :-
 
 game_cycle(GameState) :-
     display_game(GameState), !,
+    valid_moves(GameState, ListOfMoves),
+    print_list(ListOfMoves),
+    nl,
     choose_move(GameState, Move),
     move(GameState, Move, Temp),
     next_turn(Temp, NewGameState),
@@ -177,3 +180,14 @@ play :-
     menu(GameState), !,
     game_cycle(GameState), !, 
     clear_data.
+
+valid_moves([Board, Player, _, _], ListOfMoves) :-
+    length(Board, Size),
+    Pieces = [t, d, s],
+    Directions = [1, 2, 3, 4],
+    findall(Piece-Direction, (
+        member(Piece, Pieces),
+        member(Direction, Directions),
+        position(Piece-Player, Pos),
+        valid_move(Board, Piece-Player, Pos, Size, Direction)
+    ), ListOfMoves).
