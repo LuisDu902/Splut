@@ -79,21 +79,21 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
 
 % choose_move(+GameState, -Move)
 % Allows the computer to choose a move based on the current game state.
-choose_move([Board,Player,_,_], Move):-
+choose_move([Board, Player, _, _], Move):-
     computer_level(Player, Level),                 
-    choose_move(Board, Player, Level, Move), !.   
+    choose_move([Board, Player, _, _], Level, Move), !.   
 
 % -----------------------------------------
 
 % choose_move(+Board, +Player, +Level, -Move)
 % Chooses a random valid move from the available options on the game board.
-choose_move(Board, Player, 1, Move) :-
+choose_move(GameState, 1, Move) :-
     valid_moves(GameState, ListOfMoves),
     random_member(Move, ListOfMoves).
 
 
-choose_move(Board, Player, 2, Move) :-
-   protect_sorcerer(Board, Player, Move).
+choose_move(GameState, 2, Move) :-
+   protect_sorcerer(GameState, Move).
 
 % -----------------------------------------
 
