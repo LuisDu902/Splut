@@ -158,7 +158,8 @@ clear_data:-
     retractall(player_name(_,_)),
     retractall(computer_level(_,_)),
     retractall(moved_rocks(_,_)),
-    retractall(chosen_rock(_,_,_)).
+    retractall(chosen_rock(_,_,_)),
+    retractall(greedy_move(_,_,_)).
 
 
 clear_console:-

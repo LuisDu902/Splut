@@ -79,9 +79,9 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
 
 % choose_move(+GameState, -Move)
 % Allows the computer to choose a move based on the current game state.
-choose_move([Board, Player, _, _], Move):-
+choose_move([Board, Player, NrMove, Turn], Move):-
     computer_level(Player, Level),                 
-    choose_move([Board, Player, _, _], Level, Move), !.   
+    choose_move([Board, Player, NrMove, Turn], Level, Move), !.   
 
 % -----------------------------------------
 
@@ -93,7 +93,7 @@ choose_move(GameState, 1, Move) :-
 
 
 choose_move(GameState, 2, Move) :-
-   protect_sorcerer(GameState, Move).
+    protect_sorcerer(GameState, Move).
 
 % -----------------------------------------
 
@@ -152,6 +152,19 @@ move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-
     ).
     
 
+% move(+GameState, +Piece-Direction, -NewGameState)
+% Performs a computer move for the specified piece in the given direction and updates the game state.
+move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-   
+    computer_level(Player, 2),
+    (
+        Piece == t -> random_troll_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
+        Piece == s -> greedy_sorcerer_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
+        Piece == d -> dwarf_move([Board, Player, NrMove, Turn], Direction, NewGameState),  
+                      position(d-Player, NewX-NewY),
+                      format('I moved my dwarf to (~d, ~d)', [NewX, NewY])   
+    ).
+    
+
 % -----------------------------------------
 
 next_turn([Board, Player, NrMove, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
@@ -196,10 +209,10 @@ game_cycle(GameState) :-
 % play
 % Initiates and controls the entire gameplay, including setup, game flow, and cleanup.
 play :- 
+    clear_data,
     menu(GameState), !,
     clear_console,
-    game_cycle(GameState), !, 
-    clear_data.
+    game_cycle(GameState), !.
 
 valid_moves([Board, Player, _, _], ListOfMoves) :-
     length(Board, Size),

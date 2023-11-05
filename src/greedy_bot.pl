@@ -46,10 +46,15 @@ is_safe(X-Y, Player) :-
 
 % -----------------------------------------
 
-protect_sorcerer([Board, Player, _, Turn], Move) :-
-    position(s-Player, Pos),
-    possible_paths(Board, Pos, Paths),
-    findall(Path, (member(Path, Positions), last(Path, NewPos), is_safe(NewPos, Player)), SafePaths).
+protect_sorcerer([Board, Player, NrMove, Turn], Move) :-
+    (\+greedy_move(Move, NrMove, Turn) ->
+        position(s-Player, Pos),
+        possible_paths(Board, Pos, Paths),
+        findall(Path, (member(Path, Paths), last(Path, NewPos), is_safe(NewPos, Player)), SafePaths),
+        random_member(ChosenPath, SafePaths),
+        greedy_sorcerer(ChosenPath, Turn),
+        greedy_move(Move, 1, Turn);
+    greedy_move(Move, NrMove, Turn)).
 
 
 
@@ -78,7 +83,11 @@ possible_paths(Board, Pos, Positions):-
     remove_dups(Posi, Positions).
 
 greedy_sorcerer([A, B, C, D], Turn):-
-    write('hi'),
     new_pos(A, D1, B), asserta(greedy_move(s-D1, 1, Turn)),
     new_pos(B, D2, C), asserta(greedy_move(s-D2, 2, Turn)),
-    new_pos(C, D3, D). asserta(greedy_move(s-D3, 3, Turn)).
+    new_pos(C, D3, D), asserta(greedy_move(s-D3, 3, Turn)).
+
+greedy_sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]):-
+    position(s-Player, Pos),
+    new_pos(Pos, Direction, NewPos),
+    general_move(Board, s-Player, Pos, NewPos, NewBoard).
