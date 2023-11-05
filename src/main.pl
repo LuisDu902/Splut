@@ -92,10 +92,32 @@ choose_move(GameState, 1, Move) :-
     random_member(Move, ListOfMoves).
 
 
-choose_move(GameState, 2, Move) :-
-    protect_sorcerer(GameState, Move).
+
+
+choose_move([Board, Player, NrMove, Turn], 2, Move) :-
+    (\+greedy_move(_, NrMove, Turn) ->
+        value([Board, Player, NrMove, Turn], Value),
+        (Value == -1 -> 
+            (can_protect([Board, Player, NrMove, Turn]) ->
+                protect_sorcerer([Board, Player, 1, Turn], Move);
+                write('I cant protect my sorcerer\n'),
+                move_closer([Board, Player, 1, Turn], Move)
+            )
+            
+            ;
+            write('There is no need to protect my sorcerer\n'),
+            move_closer([Board, Player, 1, Turn], Move)
+        )
+        
+    ;
+    greedy_move(Move, NrMove, Turn)
+    ).
 
 % -----------------------------------------
+
+% value(GameState, 1):- can_attack(), !.
+value(GameState, -1):- true, !.
+value(_, 0):- !.
 
 % general_valid_move(+NewPos)
 % Checks if the specified position (NewPos) is an empty position on the game board.
@@ -158,7 +180,7 @@ move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-
     computer_level(Player, 2),
     (
         Piece == t -> random_troll_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
-        Piece == s -> greedy_sorcerer_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
+        Piece == s -> greedy_sorcerer_move([Board, Player, NrMove, Turn], Direction, NewGameState);
         Piece == d -> dwarf_move([Board, Player, NrMove, Turn], Direction, NewGameState),  
                       position(d-Player, NewX-NewY),
                       format('I moved my dwarf to (~d, ~d)', [NewX, NewY])   
