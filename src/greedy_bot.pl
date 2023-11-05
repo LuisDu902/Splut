@@ -1,3 +1,8 @@
+
+% greedy_move(Piece-Dir, NrMove, Turn)
+:- dynamic greedy_move/3.
+
+
 most_threatening_rock(Player, Rock) :-
     next_player(Player, Opponent),
     D1 is distance(t-Opponent, r-1),
@@ -41,33 +46,39 @@ is_safe(X-Y, Player) :-
 
 % -----------------------------------------
 
-protect_sorcerer(Board, Player, s-Dir) :-
+protect_sorcerer([Board, Player, _, Turn], Move) :-
     position(s-Player, Pos),
-    reachable_pos(Board, Pos, Positions),
-    write('REACHABLE SQUARES IN 3 MOVES : '), print_list(Positions), nl,
-    findall(NewPos, (member(NewPos, Positions), is_safe(NewPos, Player)), SafePos),
-    write('SAFE SQUARES : '),
-    print_list(SafePos).
+    possible_paths(Board, Pos, Paths),
+    findall(Path, (member(Path, Positions), last(Path, NewPos), is_safe(NewPos, Player)), SafePaths).
+
 
 
 reach_pos(_, [], []).
-reach_pos(Size, [Pos|R], [PossiblePos|Rest]) :-
+reach_pos(Size, [List|R], [PossiblePos|Rest]) :-
     Directions = [1, 2, 3, 4],
-    findall(NewPos, (
+    last(List, Pos),
+    findall(ListWithNewPos, (
         member(Direction, Directions),
         new_pos(Pos, Direction, NewPos),
         inside_board(NewPos, Size),
-        \+ position(_, NewPos)
+        \+ position(_, NewPos),
+        append(List, [NewPos], ListWithNewPos)
     ), PossiblePos),
     reach_pos(Size, R, Rest).
     
 
-reachable_pos(Board, Pos, Positions):-
+possible_paths(Board, Pos, Positions):-
     length(Board, Size),
-    reach_pos(Size, [Pos], F),
+    reach_pos(Size, [[Pos]], F),
     append(F, First),
     reach_pos(Size, First, Second),
     append(Second, NonReachable),
     reach_pos(Size, NonReachable, Final),
     append(Final, Posi),
     remove_dups(Posi, Positions).
+
+greedy_sorcerer([A, B, C, D], Turn):-
+    write('hi'),
+    new_pos(A, D1, B), asserta(greedy_move(s-D1, 1, Turn)),
+    new_pos(B, D2, C), asserta(greedy_move(s-D2, 2, Turn)),
+    new_pos(C, D3, D). asserta(greedy_move(s-D3, 3, Turn)).
