@@ -22,3 +22,53 @@ danger_sorcerer(Player) :-
     same_axis(s-Player, r-4).
 
 % -----------------------------------------
+
+
+need_protection(Board, Player) :-
+    next_player(Player, Opponent),
+    can_attack(Board, Opponent).
+
+% -----------------------------------------
+
+can_step_aside(Board, X-Y, Player) :-
+    length(Board, Size),
+    inside_board(X-Y, Size),
+    \+position(_, X-Y),
+    next_player(Player, Opponent),
+    AttackingPieces = [r-1, r-2, r-3, r-4, t-Opponent],
+    findall(Piece, (member(Piece, AttackingPieces),
+        position(Piece, PX-PY),
+        (X =:= PX ; Y =:= PY)), Pieces),
+    length(Pieces, L),
+    L = 0.
+
+% -----------------------------------------
+
+protect_sorcerer(Board, Player, s-Dir) :-
+    position(s-Player, Pos),
+    reachable_pos(Board, Pos, Positions),
+    print_list(Positions).
+
+
+
+reach_pos([], []).
+
+reach_pos([Pos|R], [PossiblePos | Rest]) :-
+    Directions = [1, 2, 3, 4],
+    findall(NewPos, 
+        (member(Direction, Directions), 
+        new_pos(Pos, Direction, NewPos),
+        inside_board(NewPos, 9)), 
+        PossiblePos),
+    reach_pos(R, Rest).
+    
+
+reachable_pos(Board, Pos, Positions):-
+    length(Board, Size),
+    reach_pos([Pos], F),
+    append(F, First),
+    reach_pos(First, Second),
+    append(Second, NonReachable),
+    reach_pos(NonReachable, Final),
+    append(Final, Posi),
+    remove_dups(Posi, Positions).

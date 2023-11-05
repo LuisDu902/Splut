@@ -88,8 +88,12 @@ choose_move([Board,Player,_,_], Move):-
 % choose_move(+Board, +Player, +Level, -Move)
 % Chooses a random valid move from the available options on the game board.
 choose_move(Board, Player, 1, Move) :-
-    valid_moves([Board, Player, _, _], ListOfMoves),
+    valid_moves(GameState, ListOfMoves),
     random_member(Move, ListOfMoves).
+
+
+choose_move(Board, Player, 2, Move) :-
+   protect_sorcerer(Board, Player, Move).
 
 % -----------------------------------------
 

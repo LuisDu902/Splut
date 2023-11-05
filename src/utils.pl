@@ -167,8 +167,8 @@ clear_console:-
 
 % min2(+A, +B, -Output)
 % Auxiliary functions to return the smallest between two arguments
-min2(A-X, B-Y, A-X) :- A <= B.
-min2(A-X, B-Y, B-Y) :- B < A.
+min2(A-X, B-Y, A-X) :- A =< B.
+min2(A-X, B-Y, B-Y) :- B < A .
 
 % -----------------------------------------
 
