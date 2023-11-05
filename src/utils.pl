@@ -167,8 +167,8 @@ clear_console:-
 
 % min2(+A, +B, -Output)
 % Auxiliary functions to return the smallest between two arguments
-min2(A-X, B-Y, A-X) :- A <= B.
-min2(A-X, B-Y, B-Y) :- B < A.
+min2(A-X, B-Y, A-X) :- (A =< B).
+min2(A-X, B-Y, B-Y) :- (B < A).
 
 % -----------------------------------------
 
@@ -180,3 +180,8 @@ min4(A-X, B-Y, C-Z, D-W, O) :-
     min2(Temp2, D-W, Smallest-O).
 
 % -----------------------------------------
+
+distance(Piece1, Piece2, Dist) :-
+    position(Piece1, X1-Y1),
+    position(Piece2, X2-Y2),
+    Dist is (abs(X2-X1) + abs(Y2-Y1)).
