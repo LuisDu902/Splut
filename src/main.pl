@@ -150,6 +150,8 @@ move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-
 
 % -----------------------------------------
 
+% next_turn(+GameState, -NewGameState)
+% advances the game to the next turn. if the current turn has less than 3 moves, increase moves by 1.
 next_turn([Board, Player, NrMove, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
     (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is 1, nl; 
     Turns = 2, NrMove \= 1, NewTurns is 3, next_player(Player, NewPlayer), NewMoves is 1, nl;   

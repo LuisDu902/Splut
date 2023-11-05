@@ -1,3 +1,5 @@
+% most_threatening_rock(+Player, -Rock)
+% Calculates which is the most threatening rock
 most_threatening_rock(Player, Rock) :-
     next_player(Player, Opponent),
     D1 is distance(t-Opponent, r-1),
@@ -8,6 +10,8 @@ most_threatening_rock(Player, Rock) :-
 
 % -----------------------------------------
 
+% same_axis(+Piece1, +Piece2)
+% checks whether two pieces are on the same axis
 same_axis(Piece1, Piece2) :-
     position(Piece1, X1-Y1),
     position(Piece2, X2-Y2),
@@ -15,6 +19,8 @@ same_axis(Piece1, Piece2) :-
 
 % -----------------------------------------
 
+% danger_sorcerer(+Player)
+% checks whether the sorcerer is in danger or not, by checking whether he is on the same axis as any rock.
 danger_sorcerer(Player) :-
     same_axis(s-Player, r-1),
     same_axis(s-Player, r-2),

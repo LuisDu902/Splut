@@ -20,6 +20,7 @@ can_push(Board, X-Y, Direction) :-
 
 % -----------------------------------------
 
+% dwarf_move(+[Board,Player,Move,Turn], +Direction, -[NewBoard,Player,Move,Turn])
 % Moves the dwarf taking into consideration the fact that he has to push the other pieces with him
 dwarf_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]) :-
     position(d-Player, Pos),
