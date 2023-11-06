@@ -14,7 +14,7 @@ This project was developed for the course Functional and Logic Programming, with
 | Student Number | Name          | Contribution |
 | -------------- | ------------- | ------------ |
 | 202105385      | Luís Du       | 34 %         |
-| 202005832      | Tiago Gouveia | 33 %         |
+| 202005832      | Luís Sousa | 33 %         |
 | 202108783      | Tiago Gouveia | 33 %         |
 
 ## Installation and Execution
