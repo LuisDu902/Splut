@@ -20,6 +20,7 @@ can_push(Board, X-Y, Direction) :-
 
 % -----------------------------------------
 
+% dwarf_move(+[Board,Player,Move,Turn], +Direction, -[NewBoard,Player,Move,Turn])
 % Moves the dwarf taking into consideration the fact that he has to push the other pieces with him
 dwarf_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]) :-
     position(d-Player, Pos),
@@ -61,9 +62,3 @@ get_push_pieces(List, Direction, Pieces):-
     ((Direction =:= 2; Direction =:= 4) -> find_elem(List, [x-x], Len), sublist(List, Pieces, 0, Len);
     find_reverse_elem(List, [x-x], Len), sublist(List, Pieces, _, Len, 0)).
   
-print_list([]). 
-print_list([H|T]) :-
-    write(H), 
-    write(' '), 
-    print_list(T). 
-
