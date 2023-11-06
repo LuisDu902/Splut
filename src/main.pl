@@ -49,15 +49,15 @@ choose_piece(Player, Piece):-
 
 % -----------------------------------------
 
-% choose_direction(-D)
+% choose_direction(-Direction)
 % Allows the player to choose a direction to move to (1 for up, 2 for down, 3 for left, 4 for right).
-choose_direction(D):-
+choose_direction(Direction):-
     write('\nChoose the direction to move to: \n'),
     write('[1] Up\n'),
     write('[2] Down\n'),
     write('[3] Left\n'),
     write('[4] Right\n\n'),
-    select_option(1, 4, D).
+    select_option(1, 4, Direction).
 
 % -----------------------------------------
 
@@ -70,7 +70,6 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
     choose_piece(Player, Piece),
     position(Piece-Player, X-Y),
     choose_direction(Direction),
-   
     (valid_move(Board, Piece-Player, X-Y, Size, Direction) -> true ; 
     format('Please input a valid move: ', []), fail).
 
@@ -90,9 +89,6 @@ choose_move(GameState, 1, Move) :-
     valid_moves(GameState, ListOfMoves),
     random_member(Move, ListOfMoves).
 
-
-
-
 choose_move([Board, Player, NrMove, Turn], 2, Move) :-
     (\+greedy_move(_, NrMove, Turn) ->
         value([Board, Player, NrMove, Turn], Value),
@@ -101,7 +97,6 @@ choose_move([Board, Player, NrMove, Turn], 2, Move) :-
             Value == -1 -> 
                 (can_protect([Board, Player, NrMove, Turn]) ->
                     protect_sorcerer([Board, Player, 1, Turn], Move);
-
                     move_closer([Board, Player, 1, Turn], Move)
                 );
             move_closer([Board, Player, 1, Turn], Move)
@@ -112,14 +107,33 @@ choose_move([Board, Player, NrMove, Turn], 2, Move) :-
 
 % -----------------------------------------
 
-value([Board, Player, NrMove, Turn], 1):- can_attack(Board, Player, Turn), !.
-value([Board, Player, NrMove, Turn], -1):- need_protection(Board, Player, Turn), !.
+% value(+GameState, -Value) 
+% Evaluates the current game state 
+value([Board, Player, NrMove, Turn], 1) :- can_attack(Board, Player, Turn), !.
+value([Board, Player, NrMove, Turn], -1) :- need_protection(Board, Player, Turn), !.
 value(_, 0):- !.
+
+% -----------------------------------------
 
 % general_valid_move(+NewPos)
 % Checks if the specified position (NewPos) is an empty position on the game board.
 general_valid_move(NewPos) :-
     \+ position(_-_, NewPos).
+
+% -----------------------------------------
+
+% valid_moves(+GameState, -ListOfMoves)
+% Calculates all the valid moves
+valid_moves([Board, Player, _, _], ListOfMoves) :-
+    length(Board, Size),
+    Pieces = [t, d, s],
+    Directions = [1, 2, 3, 4],
+    findall(Piece-Direction, (
+        member(Piece, Pieces),
+        member(Direction, Directions),
+        position(Piece-Player, Pos),
+        valid_move(Board, Piece-Player, Pos, Size, Direction)
+    ), ListOfMoves).
 
 % -----------------------------------------
 
@@ -153,13 +167,11 @@ move([Board, Player, Move, Turn], Piece-Direction, NewGameState) :-
         Piece == s -> sorcerer_move([Board, Player, Move, Turn], Direction, NewGameState);
         Piece == d -> dwarf_move([Board, Player, Move, Turn], Direction, NewGameState)
     ), !.
-    
-
 
 % -----------------------------------------
 
 % move(+GameState, +Piece-Direction, -NewGameState)
-% Performs a computer move for the specified piece in the given direction and updates the game state.
+% Performs a random computer move for the specified piece in the given direction and updates the game state.
 move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-   
     computer_level(Player, 1),
     (
@@ -169,10 +181,11 @@ move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-
                       position(d-Player, NewX-NewY),
                       format('I moved my dwarf to (~d, ~d)', [NewX, NewY])   
     ).
-    
+
+% -----------------------------------------
 
 % move(+GameState, +Piece-Direction, -NewGameState)
-% Performs a computer move for the specified piece in the given direction and updates the game state.
+% Performs a greedy computer move for the specified piece in the given direction and updates the game state.
 move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-   
     computer_level(Player, 2),
     (
@@ -183,15 +196,17 @@ move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-
                       format('I moved my dwarf to (~d, ~d)', [NewX, NewY])   
     ).
     
-
 % -----------------------------------------
 
+% next_turn(+GameState, -NewGameState) 
+% Calculates which player will play next, updating the number of moves and turns
 next_turn([Board, Player, NrMove, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
     (Turns = 1, NewTurns is 2, next_player(Player, NewPlayer), NewMoves is 1, nl; 
     Turns = 2, NrMove \= 1, NewTurns is 3, next_player(Player, NewPlayer), NewMoves is 1, nl;   
     NrMove < 3, NewMoves is NrMove + 1, NewPlayer = Player, NewTurns is Turns;   
     NrMove = 3, NewTurns is Turns + 1, next_player(Player, NewPlayer), NewMoves is 1, nl).
 
+% -----------------------------------------
 
 % game_over(-Winner)
 % Checks if the game is over and determines the winner.
@@ -237,14 +252,3 @@ play :-
     menu(GameState), !,
     clear_console,
     game_cycle(GameState), !.
-
-valid_moves([Board, Player, _, _], ListOfMoves) :-
-    length(Board, Size),
-    Pieces = [t, d, s],
-    Directions = [1, 2, 3, 4],
-    findall(Piece-Direction, (
-        member(Piece, Pieces),
-        member(Direction, Directions),
-        position(Piece-Player, Pos),
-        valid_move(Board, Piece-Player, Pos, Size, Direction)
-    ), ListOfMoves).
