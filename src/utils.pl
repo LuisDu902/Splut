@@ -181,3 +181,20 @@ min4(A-X, B-Y, C-Z, D-W, O) :-
     min2(Temp2, D-W, Smallest-O).
 
 % -----------------------------------------
+
+distance(Piece1, Piece2, Dist) :-
+    position(Piece1, X1-Y1),
+    position(Piece2, X2-Y2),
+    Dist is (abs(X2-X1) + abs(Y2-Y1)).
+
+% -----------------------------------------
+
+intersect([], _, []).
+
+intersect([X|Rest1], List2, [X|Rest3]) :-
+    member(X, List2),
+    intersect(Rest1, List2, Rest3).
+
+intersect([X|Rest1], List2, Rest3) :-
+    \+ member(X, List2),
+    intersect(Rest1, List2, Rest3).

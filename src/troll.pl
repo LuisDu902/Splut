@@ -154,9 +154,7 @@ new_rock_pos(List, X-Y, 4, NewX-Y):-
 
 find_last(List, Element, Index) :-
     reverse(List, Reversed), 
-    nth1(Index, Reversed, Element),
-    format('I should just move ~d spaces', [Index]).
+    nth1(Index, Reversed, Element).
 
 find_last_reversed(List, Element, Index) :-
-    nth1(Index, List, Element),
-    format('I should just move ~d spaces', [Index]).
+    nth1(Index, List, Element).0m

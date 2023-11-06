@@ -97,25 +97,24 @@ choose_move(GameState, 1, Move) :-
 choose_move([Board, Player, NrMove, Turn], 2, Move) :-
     (\+greedy_move(_, NrMove, Turn) ->
         value([Board, Player, NrMove, Turn], Value),
-        (Value == -1 -> 
-            (can_protect([Board, Player, NrMove, Turn]) ->
-                protect_sorcerer([Board, Player, 1, Turn], Move);
-                write('I cant protect my sorcerer\n'),
-                move_closer([Board, Player, 1, Turn], Move)
-            )
-            
-            ;
+        (
+            Value == 1 -> attack([Board, Player, NrMove, Turn], Move);
+            Value == -1 -> 
+                (can_protect([Board, Player, NrMove, Turn]) ->
+                    protect_sorcerer([Board, Player, 1, Turn], Move);
+                    write('I cant protect my sorcerer\n'),
+                    move_closer([Board, Player, 1, Turn], Move)
+                );
             write('There is no need to protect my sorcerer\n'),
             move_closer([Board, Player, 1, Turn], Move)
         )
-        
     ;
     greedy_move(Move, NrMove, Turn)
     ).
 
 % -----------------------------------------
 
-% value(GameState, 1):- can_attack(), !.
+value([Board, Player, NrMove, Turn], 1):- can_attack(Board, Player, Turn), !.
 value(GameState, -1):- true, !.
 value(_, 0):- !.
 
@@ -179,7 +178,7 @@ move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-
 move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-   
     computer_level(Player, 2),
     (
-        Piece == t -> random_troll_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
+        Piece == t -> greedy_troll_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
         Piece == s -> greedy_sorcerer_move([Board, Player, NrMove, Turn], Direction, NewGameState);
         Piece == d -> dwarf_move([Board, Player, NrMove, Turn], Direction, NewGameState),  
                       position(d-Player, NewX-NewY),
