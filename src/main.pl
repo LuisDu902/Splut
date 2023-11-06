@@ -13,12 +13,12 @@
 
 % display_turn(+Player, +Move, +Turn)
 % Displays a message indicating the players turn and the number of moves and turns made.
-display_turn(Player, Move, Turn):-
+display_turn(Player, Move, Turn) :-
     \+computer_level(Player, _),
     player_name(Player, Name),
     format('\n\nYour turn to play, ~a! This is your move ~d of turn ~d \n\n', [Name, Move, Turn]), !. 
 
-display_turn(Player, Move, Turn):-
+display_turn(Player, Move, Turn) :-
     player_name(Player, Name),
     format('\n~a move ~d of turn ~d: ', [Name, Move, Turn]), !. 
 
@@ -34,7 +34,7 @@ display_game([Board, Player, Move, Turn]) :-
 
 % choose_piece(+Player, -Piece)
 % Allows the player to choose a piece (stonetroll, dwarf, or sorcerer) to move.
-choose_piece(Player, Piece):-
+choose_piece(Player, Piece) :-
     write('\nChoose the piece to move: \n'),
     write('[t] Stonetroll\n'),
     write('[d] Dwarf\n'),
@@ -51,7 +51,7 @@ choose_piece(Player, Piece):-
 
 % choose_direction(-Direction)
 % Allows the player to choose a direction to move to (1 for up, 2 for down, 3 for left, 4 for right).
-choose_direction(Direction):-
+choose_direction(Direction) :-
     write('\nChoose the direction to move to: \n'),
     write('[1] Up\n'),
     write('[2] Down\n'),
@@ -77,7 +77,7 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
 
 % choose_move(+GameState, -Move)
 % Allows the computer to choose a move based on the current game state.
-choose_move([Board, Player, NrMove, Turn], Move):-
+choose_move([Board, Player, NrMove, Turn], Move) :-
     computer_level(Player, Level),                 
     choose_move([Board, Player, NrMove, Turn], Level, Move), !.   
 
@@ -109,9 +109,9 @@ choose_move([Board, Player, NrMove, Turn], 2, Move) :-
 
 % value(+GameState, -Value) 
 % Evaluates the current game state 
-value([Board, Player, NrMove, Turn], 1) :- can_attack(Board, Player, Turn), !.
-value([Board, Player, NrMove, Turn], -1) :- need_protection(Board, Player, Turn), !.
-value(_, 0):- !.
+value([Board, Player, _, _], 1) :- can_attack(Board, Player), !.
+value([Board, Player, _, _], -1) :- need_protection(Board, Player), !.
+value(_, 0) :- !.
 
 % -----------------------------------------
 
@@ -152,7 +152,7 @@ valid_move(Board, Piece-_, Pos, Size, Direction) :-
 
 % general_move(+Board, +Piece, +Pos, +NewPos, -NewBoard)
 % Performs a general move for a piece on the game board and updates the board configuration.
-general_move(Board, Piece, Pos, NewPos, NewBoard):-
+general_move(Board, Piece, Pos, NewPos, NewBoard) :-
     update_piece_pos(Piece, NewPos),
     swap_places(Board, Piece, Pos, x-x, NewPos, NewBoard).
 
@@ -219,7 +219,7 @@ game_over(Winner) :-
 
 % congratulate(+Winner)
 % Prints a congratulatory message for the winner of the game.
-congratulate(Winner):-
+congratulate(Winner) :-
     player_name(Winner, Name),
     write(' __  __     ______     __  __        __     __     ______     __   __    \n'), 
     write('/\\ \\_\\ \\   /\\  __ \\   /\\ \\/\\ \\      /\\ \\  _ \\ \\   /\\  __ \\   /\\ "-.\\ \\   \n'),

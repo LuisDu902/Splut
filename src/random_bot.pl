@@ -30,7 +30,7 @@ random_troll_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, New
 
 % random_throw_rock(+Board, +Player, +Position, -Direction)
 % Randomly selects a direction to throw a rock from the specified position on the game board.
-random_throw_rock(Board, _-Player, Position, Direction):-
+random_throw_rock(Board, _-Player, Position, Direction) :-
     Directions = [1,2,3,4],
     findall(Dir, (member(Dir, Directions), valid_throw_direction(Board, Player, Position, Dir)), ValidDirs),
     random_member(Direction, ValidDirs).
@@ -39,7 +39,7 @@ random_throw_rock(Board, _-Player, Position, Direction):-
 
 % random_sorcerer_move(+GameState, +Direction, -NewGameState)
 % Determines a random move for the sorcerer on the game board and updates the board accordingly.
-random_sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]):-
+random_sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]) :-
     position(s-Player, Pos),    
     new_pos(Pos, Direction, NewX-NewY),
     movable_rocks(Turn, Move, Board, Direction, Rocks),
@@ -72,7 +72,7 @@ random_sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, 
 
 % random_first_levitation(+Board, +Move, +Turn, +Sorcerer, +Pos, -NewX-Newy, +Direction, +Rocks, -NewBoard)
 % Randomly selects a rock to start levitating
-random_first_levitation(Board, Move, Turn, Sorcerer, Pos, NewX-NewY, Direction, Rocks, NewBoard):-
+random_first_levitation(Board, Move, Turn, Sorcerer, Pos, NewX-NewY, Direction, Rocks, NewBoard) :-
     random_member(Rock, Rocks),
     position(Rock, RockX-RockY),
     new_pos(RockX-RockY, Direction, NewRockPos),

@@ -1,5 +1,5 @@
 % -----------------------------------------
-% |           Menu predicates            |
+% |           Menu predicates             |
 % -----------------------------------------
 
 % player_name(+Player, -Name)
@@ -69,7 +69,7 @@ choose_mode :-
 
 % choose_name(+Player)
 % Prompts the specified player to enter their name and stores it in the knowledge base.
-choose_name(Player):-
+choose_name(Player) :-
     format('[~a] Please enter your name : ', [Player]),
     read_string_input(Name, []),
     asserta(player_name(Player, Name)).
@@ -89,7 +89,7 @@ choose_level(Computer) :-
 
 % choose_board_size(-Size)
 % Prompts the user to choose the size of the game board and reads the selected size.
-choose_board_size(Size):-
+choose_board_size(Size) :-
     write('\nChoose the board size (odd number greater than 7): '),
     select_board(Size).
 
@@ -97,7 +97,7 @@ choose_board_size(Size):-
 
 % initial_state(+Size, -State)
 % Generates the initial state of the game given the board size.
-initial_state(Size, [Board, p1, 1, 1]):-
+initial_state(Size, [Board, p1, 1, 1]) :-
     create_board(Size, Board).
 
 % -----------------------------------------

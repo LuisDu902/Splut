@@ -4,7 +4,7 @@
 
 % valid_dwarf_move(+Board, +Pos, +Direction)
 % Determines if the intended move is valid given that the dwarf is the one performing the movement
-valid_dwarf_move(Board, Pos, Direction):-
+valid_dwarf_move(Board, Pos, Direction) :-
     new_pos(Pos, Direction, NewPos),
     (\+ position(_-_, NewPos) -> true ; (can_push(Board, Pos, Direction))).
 
@@ -34,7 +34,7 @@ dwarf_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn
 
 % push(+Board, +X-Y, +Direction, -NewBoard)
 % Pushes all pieces next to the dwarf in the direction of the movement one space
-push(Board, Turn, X-Y, Direction, NewBoard):-
+push(Board, Turn, X-Y, Direction, NewBoard) :-
    length(Board, Size),
    ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
    nth1(Y, Board, List), get_remaining(X, List, Size, Rest, Direction)),
@@ -58,7 +58,7 @@ push_pieces(Board, Turn, [Piece|Rest], Direction, NewBoard) :-
 
 % get_push_pieces(+List, +Direction, -Pieces)
 % Determines the list of pieces in the specified direction that need to be pushed by the dwarf
-get_push_pieces(List, Direction, Pieces):-
+get_push_pieces(List, Direction, Pieces) :-
     ((Direction =:= 2; Direction =:= 4) -> find_elem(List, [x-x], Len), sublist(List, Pieces, 0, Len);
     find_reverse_elem(List, [x-x], Len), sublist(List, Pieces, _, Len, 0)).
   

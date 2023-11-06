@@ -28,28 +28,28 @@ assert_pieces([Piece|Rest], Row, Col) :-
 
 % create_row(+Index, +Size, -Row)
 % Generates a row for the game board based on the given Index and Size.
-create_row(1, Size, Row):-
+create_row(1, Size, Row) :-
     Padding is (Size - 1 ) // 2,
     create_list(Padding, e-e, A),
     B = [r-1],
     append([A, B, A], Row),   
     assert_pieces(B, 1, Padding), !.
 
-create_row(Size, Size, Row):-
+create_row(Size, Size, Row) :-
     Padding is (Size - 1 ) // 2,
     create_list(Padding, e-e, A),
     B = [r-4],
     append([A, B, A], Row), 
     assert_pieces(B, Size, Padding), !.
 
-create_row(2, Size, Row):-
+create_row(2, Size, Row) :-
     Padding is (Size - 3) // 2,
     create_list(Padding, e-e, A),
     B = [t-p2, d-p2, s-p2],
     append([A, B, A], Row),
     assert_pieces(B, 2, Padding), !.
 
-create_row(Index, Size, Row):-
+create_row(Index, Size, Row) :-
     Index is Size-1,
     Padding is (Size - 3) // 2,
     create_list(Padding, e-e, A),
@@ -57,7 +57,7 @@ create_row(Index, Size, Row):-
     append([A, B, A], Row), 
     assert_pieces(B, Index, Padding), !.
 
-create_row(Index, Size, Row):-
+create_row(Index, Size, Row) :-
     Index is (Size+1) // 2,
     Empty is Size - 2,
     create_list(Empty, x-x, A),
@@ -65,7 +65,7 @@ create_row(Index, Size, Row):-
     asserta(position(r-2, 1-Index)),
     asserta(position(r-3, Size-Index)), !.
 
-create_row(Index, Size, Row):-
+create_row(Index, Size, Row) :-
     Padding is abs((Size + 1) // 2 - Index),
     Rest is Size - 2 * Padding,
     create_list(Padding, e-e, A),
@@ -76,16 +76,16 @@ create_row(Index, Size, Row):-
 
 % create_board(+Size, -Board)
 % Generates a game board of the specified size.
-create_board(Size, Board):-
+create_board(Size, Board) :-
     create_board_aux(1, Size, [], Board).
 
 % create_board_aux(+Index, +Size, +AuxBoard, -Board)
 % Auxiliary predicate for generating a game board of the specified size.
-create_board_aux(Size, Size, AuxBoard, Board):-
+create_board_aux(Size, Size, AuxBoard, Board) :-
     create_row(Size, Size, Row),
     append(AuxBoard, [Row], Board), !.
 
-create_board_aux(Index, Size, AuxBoard, Board):-
+create_board_aux(Index, Size, AuxBoard, Board) :-
     Index < Size,
     create_row(Index, Size, Row),
     NextIndex is Index + 1,
@@ -105,7 +105,7 @@ display_board(Board) :-
 
 % display_col_index(+Column, +Size)
 % Displays the column indices from Column to Size.
-display_col_index(1, Size):-
+display_col_index(1, Size) :-
     write('  1'),
     display_col_index(2, Size).
 
@@ -163,7 +163,7 @@ display_dashes(N, N) :-
     write(' ---'),
     NewN is N - 1,
     display_dashes(NewN, N).
-    
+
 display_dashes(N, Dashes) :-
     N > 0,
     write('|---'),
@@ -188,9 +188,9 @@ display_rows([Row|Rest], Size, Index) :-
 % last_elem(+Element, +List)
 % Determines the last element in a list that matches the specified Element.
 last_elem(e-e, _).
-last_elem(_, []):- write('|').
-last_elem(_, [H | _]):- H = e-e, write('|').
-last_elem(_, [H | _]):- H \= e-e.
+last_elem(_, []) :- write('|').
+last_elem(_, [H | _]) :- H = e-e, write('|').
+last_elem(_, [H | _]) :- H \= e-e.
 
 % -----------------------------------------
 

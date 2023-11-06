@@ -10,7 +10,7 @@
 
 % sorcerer_move(+GameState, +Direction, -NewGameState)
 % Handles the movement of the sorcerer piece.
-sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]):-
+sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]) :-
     position(s-Player, Pos), new_pos(Pos, Direction, NewPos),
     movable_rocks(Turn, Move, Board, Direction, Rocks),
     length(Rocks, Size),   
@@ -31,7 +31,7 @@ sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, T
 
 % continuous_levitation(+Board, +Move, +Turn, +Sorcerer, +Pos, -NewPos, +Direction, -NewBoard)
 % Continues levitating a rock that has already been levitated in a previous turn.
-continuous_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, NewBoard):-
+continuous_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, NewBoard) :-
     chosen_rock(Rock, Turn, Move),
     position(Rock, RockPos),
     new_pos(RockPos, Direction, NewRockPos),
@@ -44,7 +44,7 @@ continuous_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, NewBo
       
 % first_levitation(+Board, +Move, +Turn, +Sorcerer, +Pos, -NewPos, +Direction, +Rocks, -NewBoard)
 % Levitates a rock if no previous rock has been levitated in the same turn
-first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, NewBoard):-
+first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, NewBoard) :-
     choose_rock_option(Rocks, I),
     position(r-I, RockPos),
     new_pos(RockPos, Direction, NewRockPos),
@@ -59,7 +59,7 @@ first_levitation(Board, Move, Turn, Sorcerer, Pos, NewPos, Direction, Rocks, New
 
 % levitate_option(-Option)
 % Asks whether the player wants to levitate a rock or not
-levitate_option(Option):-
+levitate_option(Option) :-
     write('\nDo you want to levitate a rock?\n\n'),
     write('[1] Yes\n'),
     write('[2] No\n\n'),
@@ -97,7 +97,7 @@ movable_rocks(Turn, Move, Board, Direction, Rocks) :-
     
 % choose_rock_option(+Rocks, -Option)
 % Asks the player which of the rocks they want to levitate
-choose_rock_option(Rocks, Option):-
+choose_rock_option(Rocks, Option) :-
     write('\nWhich rock do you want to levitate?\n\n'),
     print_rocks(Rocks),
     write('\nRock : '),
@@ -120,7 +120,7 @@ print_rocks([r-I|Rest]) :-
 
 % last_turn_rocks(+Turn,-Rocks)
 % Gets the rocks that were moved in the last turn
-last_turn_rocks(Turn, Rocks):-
+last_turn_rocks(Turn, Rocks) :-
     LastTurn is Turn-1,
     findall(Rock, moved_rocks(Rock, LastTurn), Rocks).
 

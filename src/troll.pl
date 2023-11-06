@@ -4,7 +4,7 @@
 
 % valid_troll_move(+Pos, +Direction)
 % Checks if a troll move to a new position in the specified direction is valid.
-valid_troll_move(Pos, Direction):-
+valid_troll_move(Pos, Direction) :-
     new_pos(Pos, Direction, NewPos),
     ((position(r-_, NewPos); \+ position(_-_, NewPos)) -> true ; false).
 
@@ -24,7 +24,7 @@ valid_throw_direction(Board, Player, Position, Direction) :-
 
 % pull_rock_option(-Option)
 % Displays the pull rock option to the player and reads the player choice.
-pull_rock_option(Option):-
+pull_rock_option(Option) :-
     write('\nDo you want to pull the rock right behind the Stonetroll?\n\n'),
     write('[1] Yes\n'),
     write('[2] No\n\n'),
@@ -47,7 +47,7 @@ pull_rock(Board, Turn, Position, Troll, Direction, NewBoard) :-
 
 % throw_rock_menu(-Direction)
 % Displays the throw rock menu to the player and reads the player chosen direction.
-throw_rock_menu(Direction):-
+throw_rock_menu(Direction) :-
     write('\nYou have found a rock! Which direction do you want to throw it?\n\n'),
     write('[1] Up\n'),
     write('[2] Down\n'),
@@ -59,7 +59,7 @@ throw_rock_menu(Direction):-
 
 % throw_rock_option(+Board, +Player, +Position, -Direction)
 % Handles the process of allowing the player to choose the direction to throw a rock.
-throw_rock_option(Board, _-Player, Position, Direction):-
+throw_rock_option(Board, _-Player, Position, Direction) :-
     repeat,
     throw_rock_menu(Direction),
     (valid_throw_direction(Board, Player, Position, Direction) -> true;
@@ -104,7 +104,7 @@ troll_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, NewMove, T
 
 % move_rock(+Board, +Rock, +Direction, -NewBoard)
 % Moves a rock piece in the specified direction on the game board.
-move_rock(Board, Rock, Direction, NewBoard):-
+move_rock(Board, Rock, Direction, NewBoard) :-
     position(Rock, X-Y),
     length(Board, Size),
     ((Direction =:= 1; Direction =:= 2) -> get_col(X, Board, List), get_remaining(Y, List, Size, Rest, Direction);   
@@ -121,7 +121,7 @@ move_rock(Board, Rock, Direction, NewBoard):-
 new_rock_pos([], Pos, _, Pos).
 
 % move up
-new_rock_pos(List, X-Y, 1, X-NewY):-
+new_rock_pos(List, X-Y, 1, X-NewY) :-
     (\+find_reverse_elem(List, [r-_, t-_, e-e, s-_], A) -> 
         find_last_reversed(List, x-x, A); 
         find_reverse_elem(List, [r-_, t-_, e-e, s-_], A)),
@@ -129,7 +129,7 @@ new_rock_pos(List, X-Y, 1, X-NewY):-
     (position(s-_, X-TmpY) -> NewY is TmpY; NewY is Y - A).
 
 % move down
-new_rock_pos(List, X-Y, 2, X-NewY):-
+new_rock_pos(List, X-Y, 2, X-NewY) :-
     (\+find_elem(List, [r-_, t-_, e-e, s-_], A) -> 
         find_last(List, x-x, A); 
         find_elem(List, [r-_, t-_, e-e, s-_], A)),
@@ -137,7 +137,7 @@ new_rock_pos(List, X-Y, 2, X-NewY):-
     (position(s-_, X-TmpY) -> NewY is TmpY; NewY is Y + A).
 
 % move left
-new_rock_pos(List, X-Y, 3, NewX-Y):-
+new_rock_pos(List, X-Y, 3, NewX-Y) :-
     (\+find_reverse_elem(List, [r-_, t-_, e-e, s-_], A) -> 
         find_last_reversed(List, x-x, A); 
         find_reverse_elem(List, [r-_, t-_, e-e, s-_], A)),
@@ -145,7 +145,7 @@ new_rock_pos(List, X-Y, 3, NewX-Y):-
     (position(s-_, TmpX-Y) -> NewX is TmpX; NewX is X - A).
 
 % move right
-new_rock_pos(List, X-Y, 4, NewX-Y):-
+new_rock_pos(List, X-Y, 4, NewX-Y) :-
     (\+find_elem(List, [r-_, t-_, e-e, s-_], A) -> 
         find_last(List, x-x, A); 
         find_elem(List, [r-_, t-_, e-e, s-_], A)),

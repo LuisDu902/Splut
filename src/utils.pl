@@ -4,7 +4,7 @@
 
 % read_number_input(-Number)
 % Reads a number input from the user and unifies it with the variable Number.
-read_number_input(Number):-
+read_number_input(Number) :-
     read_number_input_helper(Number, 0).
 
 % read_number_input_helper(-Number, +CurrentNumber)
@@ -20,7 +20,7 @@ read_number_input_helper(Number, Number).
 
 % read_string_input(-String, +CurString)
 % Reads a string input from the user and unifies it with the variable String.
-read_string_input(String, CurString):-
+read_string_input(String, CurString) :-
     get_char(Char),
     Char \= '\n',
     append(CurString, [Char], UpdatedString),
@@ -141,7 +141,7 @@ find_reverse_elem(List, Elems, A) :-
 
 % get_remaining(+N, +List, +Size, -Rest, +Direction)
 % Extracts the remaining elements from the list based on the starting index and direction of movement.
-get_remaining(N, List, Size, Rest, Direction):-
+get_remaining(N, List, Size, Rest, Direction) :-
     (   (Direction =:= 2; Direction =:= 4) ->
         Len is Size - N,
         sublist(List, Rest, N, Len, _)
@@ -167,15 +167,6 @@ clear_data:-
 % Clears the console
 clear_console:-
     write('\33\[2J').
-
-% -----------------------------------------
-
-% distance(+Piece1, +Piece2, -Dist)
-% Calculates the distance between two pieces
-distance(Piece1, Piece2, Dist) :-
-    position(Piece1, X1-Y1),
-    position(Piece2, X2-Y2),
-    Dist is (abs(X2-X1) + abs(Y2-Y1)).
 
 % -----------------------------------------
 
