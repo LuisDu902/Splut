@@ -122,7 +122,7 @@ display_col_index(N, Size) :-
     
 % display_sep_line(+Index, +Size)
 % Displays a separator line for the game board.
-display_sep_line(0, _) :- write('|'), nl.
+display_sep_line(0, _) :- write('|'), nl, !.
 
 display_sep_line(Size, Index) :-
     Middle is (Size + 1) / 2, 
@@ -145,7 +145,7 @@ display_sep_line(Size, Index) :-
 
 % display_padding(+N)
 % Displays a specific number of padding spaces.
-display_padding(0).
+display_padding(0) :- !.
 
 display_padding(N) :-
     N > 0,
@@ -157,12 +157,13 @@ display_padding(N) :-
     
 % display_dashes(+N, +Dashes)
 % Displays a specific number of dashes for the separator line.
-display_dashes(0, _).
+display_dashes(0, _) :- !.
 
 display_dashes(N, N) :- 
     write(' ---'),
     NewN is N - 1,
     display_dashes(NewN, N).
+    
 display_dashes(N, Dashes) :-
     N > 0,
     write('|---'),
