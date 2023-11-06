@@ -189,12 +189,14 @@ distance(Piece1, Piece2, Dist) :-
 
 % -----------------------------------------
 
-intersect([], _, []).
+% substract_lists(+List1, +List2, -Difference)
+% Calculates the difference between List1 and List2
+subtract_lists([], _, []).
 
-intersect([X|Rest1], List2, [X|Rest3]) :-
+subtract_lists([X|Tail1], List2, Difference) :-
     member(X, List2),
-    intersect(Rest1, List2, Rest3).
+    subtract_lists(Tail1, List2, Difference).
 
-intersect([X|Rest1], List2, Rest3) :-
+subtract_lists([X|Tail1], List2, [X|Difference]) :-
     \+ member(X, List2),
-    intersect(Rest1, List2, Rest3).
+    subtract_lists(Tail1, List2, Difference).
