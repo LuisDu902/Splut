@@ -46,13 +46,15 @@ game_mode(2) :-
     write('\nPlaying Human vs Computer\n'),
     choose_name(p1),
     asserta((player_name(p2, 'Computer'))),
-    choose_level(p2).
+    choose_level(p2),
+    (computer_level(_, 2) -> first_moves; true).
 game_mode(3) :-
     write('\nPlaying Bot vs Bot\n'),
     asserta((player_name(p1, 'Computer1'))),
     asserta((player_name(p2, 'Computer2'))),
     choose_level(p1),
-    choose_level(p2).
+    choose_level(p2),
+    (computer_level(_, 2) -> first_moves; true).
 
 % -----------------------------------------
 

@@ -79,19 +79,44 @@ choose_move([Board, Player, _, _], Piece-Direction) :-
 
 % choose_move(+GameState, -Move)
 % Allows the computer to choose a move based on the current game state.
-choose_move([Board,Player,_,_], Move):-
+choose_move([Board, Player, NrMove, Turn], Move):-
     computer_level(Player, Level),                 
-    choose_move(Board, Player, Level, Move), !.   
+    choose_move([Board, Player, NrMove, Turn], Level, Move), !.   
 
 % -----------------------------------------
 
 % choose_move(+Board, +Player, +Level, -Move)
 % Chooses a random valid move from the available options on the game board.
-choose_move(Board, Player, 1, Move) :-
-    valid_moves([Board, Player, _, _], ListOfMoves),
+choose_move(GameState, 1, Move) :-
+    valid_moves(GameState, ListOfMoves),
     random_member(Move, ListOfMoves).
 
+
+
+
+choose_move([Board, Player, NrMove, Turn], 2, Move) :-
+    (\+greedy_move(_, NrMove, Turn) ->
+        value([Board, Player, NrMove, Turn], Value),
+        (
+            Value == 1 -> attack([Board, Player, NrMove, Turn], Move);
+            Value == -1 -> 
+                (can_protect([Board, Player, NrMove, Turn]) ->
+                    protect_sorcerer([Board, Player, 1, Turn], Move);
+                    write('I cant protect my sorcerer\n'),
+                    move_closer([Board, Player, 1, Turn], Move)
+                );
+            write('There is no need to protect my sorcerer\n'),
+            move_closer([Board, Player, 1, Turn], Move)
+        )
+    ;
+    greedy_move(Move, NrMove, Turn)
+    ).
+
 % -----------------------------------------
+
+value([Board, Player, NrMove, Turn], 1):- can_attack(Board, Player, Turn), !.
+value(GameState, -1):- true, !.
+value(_, 0):- !.
 
 % general_valid_move(+NewPos)
 % Checks if the specified position (NewPos) is an empty position on the game board.
@@ -148,6 +173,19 @@ move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-
     ).
     
 
+% move(+GameState, +Piece-Direction, -NewGameState)
+% Performs a computer move for the specified piece in the given direction and updates the game state.
+move([Board, Player, NrMove, Turn], Piece-Direction, NewGameState) :-   
+    computer_level(Player, 2),
+    (
+        Piece == t -> greedy_troll_move([Board, Player, NrMove, Turn], Direction, NewGameState) ;
+        Piece == s -> greedy_sorcerer_move([Board, Player, NrMove, Turn], Direction, NewGameState);
+        Piece == d -> dwarf_move([Board, Player, NrMove, Turn], Direction, NewGameState),  
+                      position(d-Player, NewX-NewY),
+                      format('I moved my dwarf to (~d, ~d)', [NewX, NewY])   
+    ).
+    
+
 % -----------------------------------------
 
 next_turn([Board, Player, NrMove, Turns], [Board, NewPlayer, NewMoves, NewTurns]) :-
@@ -192,10 +230,10 @@ game_cycle(GameState) :-
 % play
 % Initiates and controls the entire gameplay, including setup, game flow, and cleanup.
 play :- 
+    clear_data,
     menu(GameState), !,
     clear_console,
-    game_cycle(GameState), !, 
-    clear_data.
+    game_cycle(GameState), !.
 
 valid_moves([Board, Player, _, _], ListOfMoves) :-
     length(Board, Size),
