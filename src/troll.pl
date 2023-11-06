@@ -81,7 +81,7 @@ throw_rock(Board, Turn, Pos, Troll, Dir, ThrowDir, NewBoard) :-
 
 % ----------------------------------------
 
-
+% troll_move(+GameState, +Direction, -GameState)
 % Handles the movement of the stonetroll piece.
 troll_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, NewMove, Turn]) :-
     position(t-Player, Pos),    
@@ -152,9 +152,4 @@ new_rock_pos(List, X-Y, 4, NewX-Y):-
     TmpX is X + A + 1,
     (position(s-_, TmpX-Y) -> NewX is TmpX; NewX is X + A).
 
-find_last(List, Element, Index) :-
-    reverse(List, Reversed), 
-    nth1(Index, Reversed, Element).
 
-find_last_reversed(List, Element, Index) :-
-    nth1(Index, List, Element).

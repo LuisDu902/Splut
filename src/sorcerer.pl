@@ -9,7 +9,7 @@
 :- dynamic chosen_rock/3.
 
 % sorcerer_move(+GameState, +Direction, -NewGameState)
-% Moves the sorcerer
+% Handles the movement of the sorcerer piece.
 sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]):-
     position(s-Player, Pos), new_pos(Pos, Direction, NewPos),
     movable_rocks(Turn, Move, Board, Direction, Rocks),

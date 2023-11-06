@@ -161,27 +161,17 @@ clear_data:-
     retractall(chosen_rock(_,_,_)),
     retractall(greedy_move(_,_,_)).
 
+% -----------------------------------------
 
+% clear_console
+% Clears the console
 clear_console:-
     write('\33\[2J').
 
-
-% min2(+A, +B, -Output)
-% Auxiliary functions to return the smallest between two arguments
-min2(A-X, B-Y, A-X) :- A =< B.
-min2(A-X, B-Y, B-Y) :- B < A .
-
 % -----------------------------------------
 
-% min2(+A, +B, -Output)
-% Auxiliary functions to return the smallest between four arguments
-min4(A-X, B-Y, C-Z, D-W, O) :-
-    min2(A-X, B-Y, Temp),
-    min2(Temp, C-Z, Temp2),
-    min2(Temp2, D-W, Smallest-O).
-
-% -----------------------------------------
-
+% distance(+Piece1, +Piece2, -Dist)
+% Calculates the distance between two pieces
 distance(Piece1, Piece2, Dist) :-
     position(Piece1, X1-Y1),
     position(Piece2, X2-Y2),
@@ -200,3 +190,14 @@ subtract_lists([X|Tail1], List2, Difference) :-
 subtract_lists([X|Tail1], List2, [X|Difference]) :-
     \+ member(X, List2),
     subtract_lists(Tail1, List2, Difference).
+
+% -----------------------------------------
+
+% find_last(+List, +Element, -Index) 
+% Finds the index of the last Element in a list
+find_last(List, Element, Index) :-
+    reverse(List, Reversed), 
+    nth1(Index, Reversed, Element).
+
+find_last_reversed(List, Element, Index) :-
+    nth1(Index, List, Element).
