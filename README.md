@@ -189,7 +189,7 @@ To maintain the integrity of the system, we have implemented robust input valida
 
 - in **(1)** and **(4)**, the input is validated using the predicate **select_option/3**, which prompts the user for input and ensures that the input is within a specified range (Min to Max). If the input is within the range, the predicate succeeds; otherwise, it fails and makes use of **repeat/0** to ask the user for input again. 
 
-```pl
+```
 % select_option(+Min, +Max, -Option)
 select_option(Min, Max, Option) :-
     write('Option : '),
@@ -201,7 +201,7 @@ select_option(Min, Max, Option) :-
 
 - in **(2)**, we opt to use the predicate **read_string_input/2** to enhand user experience, as it reads a string from the input character by character until a newline character is reached.
 
-```pl
+```
 % read_string_input(-String, +CurString)
 read_string_input(String, CurString) :-
     get_char(Char),
@@ -212,7 +212,7 @@ read_string_input(String, CurString) :-
 
 - in **(3)**, the predicate **select_board/1** prompts the user for a customizable board size, ensuring that the input is an odd number greater than 7.
 
-```pl
+```
 % select_board(-Size)
 select_board(Size) :-
     repeat,
@@ -230,7 +230,7 @@ initial_state(Size, [Board, p1, 1, 1]) :-
 
 Moving on to the game playing state, we display the player and their turn to play, as the board is displayed using **display_game/1** that, in consequense, calls **display_board/1** and this last one calls **display_rows/3** on to display the board as a set of rows. Each row is displayed with its elements in the appropriate colors, making use of the ansi color codes, that prolog does support, as special output characters with the **format/3** predicate. The player one is blue, while the player two is red, and the rocks are all brown given that they do not belong to any player.
 
-```pl
+```
 display_game([Board, Player, Move, Turn]) :-
     display_turn(Player, Move, Turn),
     (\+computer_level(Player, _) -> display_board(Board); true).
@@ -253,7 +253,7 @@ Picking a move always follows the same four steps, despite every single piece ha
 
 The boardstate and the position predicates both are updated upon successfully moving a piece, done with **general_move/5**.
 
-```pl
+```
 game_cycle(GameState) :-
     display_game(GameState), !,
     choose_move(GameState, Move),
@@ -283,7 +283,7 @@ update_piece_pos(Piece, NewPos) :-
 As we can and do make an individual check on moves to evaluate their validity, the **valid_moves/2** function is nothing more than a **findall/3** call with a few restrictions in between. This function does exactly what it says, finds all valid moves. 
 Similar jobs are performed by the functions **troll_paths/3**, that finds the appropriate moves for the Stonetroll, or **possible_paths/3**, that finds all the possible tiles you can reach in one round and all the valid paths to them.
 
-```pl
+```
 % valid_moves(+GameState, -ListOfMoves)
 valid_moves([Board, Player, _, _], ListOfMoves) :-
     length(Board, Size),
@@ -343,7 +343,7 @@ value(_, 0) :- !.
 
 This computer does not possess any form of algorythmic behaviour, it simply knows the list of valid moves and randomly picks one every time.
 
-```pl
+```
 % choose_move(+Board, +Player, +Level, -Move)
 choose_move(GameState, 1, Move) :-
     valid_moves(GameState, ListOfMoves),
@@ -366,7 +366,7 @@ If neither a swift victory nor a defensive maneuver is necessary, the computer s
 
 By adhering to these strategic principles, the computer adapts its moves intelligently, maximizing its chances of success while adhering to the specified guidelines.
 
-```pl
+```
 choose_move([Board, Player, NrMove, Turn], 2, Move) :-
     (\+greedy_move(_, NrMove, Turn) ->
         value([Board, Player, NrMove, Turn], Value),
