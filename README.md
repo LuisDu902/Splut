@@ -134,7 +134,7 @@ GameState([
     [ e-e , e-e , e-e , e-e  , r-1  , e-e  , e-e , e-e , e-e ],
     [ e-e , e-e , e-e , t-p2 , x-x  , s-p2 , e-e , e-e , e-e ],
     [ e-e , e-e , x-x , x-x  , x-x  , x-x  , x-x , e-e , e-e ], 
-    [ e-e , x-x , x-x , x-x  , d-p1 , x-x  , x-x , x-x , e-e ],
+    [ e-e , x-x , x-x , x-x  , d-p2 , x-x  , x-x , x-x , e-e ],
     [ r-1 , x-x , x-x , x-x  , x-x  , x-x  , x-x , x-x , r-3 ], 
     [ e-e , x-x , x-x , x-x  , x-x  , x-x  , x-x , x-x , e-e ],
     [ e-e , e-e , x-x , s-p1 , x-x  , x-x  , x-x , e-e , e-e ], 
@@ -150,19 +150,19 @@ GameState([
 
 ```
 GameState([
-    [ e-e , e-e , e-e , e-e  , t-p2  , e-e  , e-e , e-e , e-e ],
+    [ e-e , e-e , e-e , e-e  , t-p2 , e-e  , e-e , e-e , e-e ],
     [ e-e , e-e , e-e , x-x  , x-x  , s-p2 , e-e , e-e , e-e ],
     [ e-e , e-e , x-x , x-x  , x-x  , x-x  , x-x , e-e , e-e ], 
-    [ e-e , x-x , x-x , x-x  , x-x  , x-x  , x-x , x-x , e-e ],
-    [ r-1 , x-x , x-x , x-x  , d-p2 , x-x  , x-x , x-x , r-3 ], 
+    [ e-e , x-x , x-x , x-x  , d-p1 , x-x  , x-x , x-x , e-e ],
+    [ r-1 , x-x , x-x , x-x  , x-x  , x-x  , x-x , x-x , r-3 ], 
     [ e-e , x-x , x-x , x-x  , x-x  , x-x  , x-x , x-x , e-e ],
     [ e-e , e-e , x-x , x-x  , r-1  , x-x  , x-x , e-e , e-e ], 
     [ e-e , e-e , e-e , x-x  , d-p1 , t-p1 , e-e , e-e , e-e ],
     [ e-e , e-e , e-e , e-e  , r-4  , e-e  , e-e , e-e , e-e ]
-], p1, 1, 3).
+], p1, 3, 5).
 ```
 
-<img src="images/intermediate.png" alt="Intermediate game state">
+<img src="images/final.png" alt="Final game state">
 
 ---
 
