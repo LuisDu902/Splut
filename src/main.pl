@@ -22,7 +22,6 @@ display_turn(Player, Move, Turn):-
     player_name(Player, Name),
     format('\n~a move ~d of turn ~d: ', [Name, Move, Turn]), !. 
 
-
 % -----------------------------------------
 
 % display_game(+GameState)
@@ -102,10 +101,9 @@ choose_move([Board, Player, NrMove, Turn], 2, Move) :-
             Value == -1 -> 
                 (can_protect([Board, Player, NrMove, Turn]) ->
                     protect_sorcerer([Board, Player, 1, Turn], Move);
-                    write('I cant protect my sorcerer\n'),
+
                     move_closer([Board, Player, 1, Turn], Move)
                 );
-            write('There is no need to protect my sorcerer\n'),
             move_closer([Board, Player, 1, Turn], Move)
         )
     ;
@@ -115,7 +113,7 @@ choose_move([Board, Player, NrMove, Turn], 2, Move) :-
 % -----------------------------------------
 
 value([Board, Player, NrMove, Turn], 1):- can_attack(Board, Player, Turn), !.
-value(GameState, -1):- true, !.
+value([Board, Player, NrMove, Turn], -1):- need_protection(Board, Player, Turn), !.
 value(_, 0):- !.
 
 % general_valid_move(+NewPos)
@@ -150,7 +148,7 @@ general_move(Board, Piece, Pos, NewPos, NewBoard):-
 % Performs a player move for the specified piece in the given direction and updates the game state.
 move([Board, Player, Move, Turn], Piece-Direction, NewGameState) :-   
     \+computer_level(Player, _),  
-      (
+    (
         Piece == t -> troll_move([Board, Player, Move, Turn], Direction, NewGameState);
         Piece == s -> sorcerer_move([Board, Player, Move, Turn], Direction, NewGameState);
         Piece == d -> dwarf_move([Board, Player, Move, Turn], Direction, NewGameState)
@@ -208,6 +206,11 @@ game_over(Winner) :-
 % Prints a congratulatory message for the winner of the game.
 congratulate(Winner):-
     player_name(Winner, Name),
+    write(' __  __     ______     __  __        __     __     ______     __   __    \n'), 
+    write('/\\ \\_\\ \\   /\\  __ \\   /\\ \\/\\ \\      /\\ \\  _ \\ \\   /\\  __ \\   /\\ "-.\\ \\   \n'),
+    write('\\ \\____ \\  \\ \\ \\/\\ \\  \\ \\ \\_\\ \\     \\ \\ \\/ ".\\ \\  \\ \\ \\/\\ \\  \\ \\ \\-.  \\  \n'),
+    write(' \\/\\_____\\  \\ \\_____\\  \\ \\_____\\     \\ \\__/".~\\_\\  \\ \\_____\\  \\ \\_\\\\"\\_\\ \n'),
+    write('  \\/_____/   \\/_____/   \\/_____/      \\/_/   \\/_/   \\/_____/   \\/_/ \\/_/ \n'),
     format('\nCongrats ~a! You won the game.\n', [Name]).
 
 % -----------------------------------------

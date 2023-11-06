@@ -157,4 +157,4 @@ find_last(List, Element, Index) :-
     nth1(Index, Reversed, Element).
 
 find_last_reversed(List, Element, Index) :-
-    nth1(Index, List, Element).0m
+    nth1(Index, List, Element).

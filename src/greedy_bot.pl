@@ -34,17 +34,19 @@ same_axis(Piece1, Piece2, y) :-
 % checked
 clear_shot(Board, Player, Rock, Axis) :-
     position(Rock, X-Y),
+    position(s-Player, SX-SY),
     length(Board, Size),
     (Axis == x -> get_col(X, Board, List), 
-        get_remaining(Y, List, Size, Rest1, 1), 
-        get_remaining(Y, List, Size, Rest2, 2);   
-    nth1(Y, Board, List), 
-        get_remaining(X, List, Size, Rest1, 3),
-        get_remaining(X, List, Size, Rest2, 4)),
-    new_rock_pos(Rest1, X-Y, Direction, NewPos1),
-    new_rock_pos(Rest2, X-Y, Direction, NewPos2),
-    (position(s-Player, NewPos1) ;
-    position(s-Player, NewPos2)).
+        ((SY < Y) -> 
+            get_remaining(Y, List, Size, Rest, 1);
+            get_remaining(Y, List, Size, Rest, 2)
+        );   
+        nth1(Y, Board, List), 
+        ((SX < X) -> 
+            get_remaining(X, List, Size, Rest, 3);
+            get_remaining(X, List, Size, Rest, 4))),   
+    new_rock_pos(Rest, X-Y, Direction, NewPos),
+    position(s-Player, NewPos).
 
 
 % -----------------------------------------
@@ -57,14 +59,13 @@ dangerous_rocks(Board, Player, Rock) :-
 % -----------------------------------------
 
 % checked
-reachable_rocks(Board, Player, ReachableRocks) :-
-    Rocks = [r-1, r-2, r-3, r-4],
-    position(t-Player, Pos),
-    troll_paths(Board, Pos, Paths),
+reachable_rocks(Board, Player, ReachableRocks, Rocks) :-
+    position(t-Player, X-Y),
+    troll_paths(Board, X-Y, Paths),
     findall(Rock, (
         member(Rock, Rocks),
-        position(Rock, RockPos),
-        findall(Path, (member(Path, Paths), last(Path, Lastpos), Lastpos =:= RockPos), ChosenPaths),
+        position(Rock, RX-RY),
+        findall(Path, (member(Path, Paths), last(Path, LX-LY), LX=RX, LY=RY), ChosenPaths),
         length(ChosenPaths, L), !, 
         L \= 0
     ), ReachableRocks).
@@ -75,16 +76,14 @@ reachable_rocks(Board, Player, ReachableRocks) :-
 can_attack(Board, Player, Turn) :-
     next_player(Player, Opponent),
     dangerous_rocks(Board, Opponent, Rocks),
-    reachable_rocks(Board, Player, ReachableRocks),
-    intersect(Rocks, ReachableRocks, ThrowableRocks),
+    reachable_rocks(Board, Player, ThrowableRocks, Rocks),
     length(ThrowableRocks, Tlen), !,
     Tlen \= 0 .
 
 attack([Board, Player, NrMove, Turn], Move) :-
     next_player(Player, Opponent),
     dangerous_rocks(Board, Opponent, Rocks),
-    reachable_rocks(Board, Player, ReachableRocks),
-    intersect(Rocks, ReachableRocks, ThrowableRocks),
+    reachable_rocks(Board, Player, ThrowableRocks, Rocks),
     random_member(TheRock, ThrowableRocks),
     position(TheRock, TheRockPos),
     position(t-Player, Pos),
@@ -96,10 +95,9 @@ attack([Board, Player, NrMove, Turn], Move) :-
 
 % ----------------------------------------- 
 
-need_protection(Board, Player) :-
-    write('protection\n'),
+need_protection(Board, Player, Turn) :-
     next_player(Player, Opponent),
-    can_attack(Board, Opponent).
+    can_attack(Board, Opponent, Turn).
 
 % -----------------------------------------
 
@@ -158,6 +156,14 @@ troll_paths(Board, Pos, Positions):-
     append([First, Second , Third], Posi),
     remove_dups(Posi, Positions).
 
+
+general_paths(Board, Pos, Positions, N):-
+    length(Board, Size),
+    reach_pos(Size, [[Pos]], A), append(A, First),
+    reach_pos(Size, First, B), append(B, Second),
+    reach_pos(Size, Second, C), append(C, Third),
+    nth1(N, [First, Second, Third], Positions).
+
 possible_paths(Board, Pos, Positions):-
     length(Board, Size),
     reach_pos(Size, [[Pos]], F), append(F, First),
@@ -180,18 +186,7 @@ greedy_piece_helper(Piece, [A|Rest], Index, Turn) :-
     nth1(1, Rest, NextElement),
     new_pos(A, D, NextElement),
     asserta(greedy_move(Piece-D, Index, Turn)),
-    greedy_piece_helper(Piece, [Rest], NewIndex, Turn).
-
-
-% greedy_piece(Piece, [A, B, C, D], Turn):-
-%    new_pos(A, D1, B), asserta(greedy_move(Piece-D1, 1, Turn)),
-%    new_pos(B, D2, C), asserta(greedy_move(Piece-D2, 2, Turn)),
-%    new_pos(C, D3, D), asserta(greedy_move(Piece-D3, 3, Turn)).
-
-greedy_piece_list([Piece1, Piece2, Piece3], [A, B, C, D, E, F], Turn):-
-    new_pos(A, D1, B), asserta(greedy_move(Piece1-D1, 1, Turn)),
-    new_pos(C, D2, D), asserta(greedy_move(Piece2-D2, 2, Turn)),
-    new_pos(E, D3, F), asserta(greedy_move(Piece3-D3, 3, Turn)).
+    greedy_piece_helper(Piece, Rest, NewIndex, Turn).
 
 greedy_sorcerer_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, Move, Turn]):-
     position(s-Player, Pos),
@@ -226,9 +221,8 @@ closest_rock(Player, Rock, Dist):-
     ), Distances),
     min_member(Dist-Rock, Distances).
 
-
-greedy_dwarf([Board, Player, 1, Turn], Move):-
-    position(d-Player, Pos),
+greedy(Piece, [Board, Player, 1, Turn], Move):-
+    position(Piece-Player, Pos),
     possible_paths(Board, Pos, Paths),
     random_member(ChosenPath, Paths),
     greedy_piece(d, ChosenPath, Turn),
@@ -236,9 +230,10 @@ greedy_dwarf([Board, Player, 1, Turn], Move):-
 
 move_closer([Board, Player, 1, Turn], Move):-
     closest_rock(Player, Rock, Dist),
-    
-    (Dist == 1-> greedy_dwarf([Board, Player, 1, Turn], Move); true).
-
+    (Dist < 3-> 
+        greedy(d, [Board, Player, 1, Turn], Move); 
+        greedy(t, [Board, Player, 1, Turn], Move)
+    ).
 
 
 greedy_troll_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, NewMove, Turn]) :-
@@ -254,7 +249,12 @@ greedy_troll_move([Board, Player, Move, Turn], Direction, [NewBoard, Player, New
             (NewY < SorcY, SorcX = NewX) -> ThrowDir is 2
         ),
         throw_rock(Board, Turn, Pos, t-Player, Direction, ThrowDir, NewBoard),
-        NewMove is 3
+        NewMove is 3,
+        format('I moved my stonetroll to (~d, ~d) and I threw the rock', [NewX, NewY])
     ;
-        general_move(Board, t-Player, Pos, NewX-NewY, NewBoard), NewMove is Move
-    ).
+    (opposite_direction(Direction, NewD), new_pos(Pos, NewD, A-B), position(r-_, A-B) ->
+        pull_rock(Board, Turn, Pos, t-Player, Direction, NewBoard), NewMove is Move,
+        format('I moved my stonetroll to (~d, ~d) and I pulled the rock', [NewX, NewY]); 
+        general_move(Board, t-Player, Pos, NewX-NewY, NewBoard), NewMove is Move,
+        format('I moved my stonetroll to (~d, ~d)', [NewX, NewY])
+    )).
